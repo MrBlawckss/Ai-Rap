@@ -586,41 +586,497 @@ let lastBeat = -1;
 let previousMusicTime = 0;
 
 let voices = [];
-let rapperVoices = [null, null];
 
-function loadVoices() {
-    voices = speechSynthesis.getVoices();
-    const english = voices.filter(v => v.lang.toLowerCase().startsWith("en"));
-    const pool = english.length ? english : voices;
-    if (pool.length > 0) rapperVoices[0] = pool[0];
-    if (pool.length > 1) rapperVoices[1] = pool[1];
-    else rapperVoices[1] = pool[0] || null;
-}
+let rapperVoices = [
+    null,
+    null
+];
 
-loadVoices();
-speechSynthesis.onvoiceschanged = loadVoices;
+let ttsUnlocked = false;
+let currentUtterance = null;
 
-function speakLine(text, rapperIndex) {
-    speechSynthesis.cancel();
-    rapperElements.forEach(r => r.classList.remove("speaking"));
 
-    const speech = new SpeechSynthesisUtterance(text);
-    if (rapperVoices[rapperIndex]) speech.voice = rapperVoices[rapperIndex];
+/* ============================================================
+   MOBILE + DESKTOP VOICE LOADING
+============================================================ */
 
-    if (rapperIndex === 0) {
-        speech.rate = 2.05;
-        speech.pitch = 0.72;
-    } else {
-        speech.rate = 2.0;
-        speech.pitch = 1.15;
+function getAvailableVoices() {
+
+    if (
+        !("speechSynthesis" in window)
+    ) {
+
+        return [];
+
     }
 
-    speech.volume = 0.7;
-    speech.onstart = () => rapperElements[rapperIndex].classList.add("speaking");
-    speech.onend = () => rapperElements[rapperIndex].classList.remove("speaking");
-    speech.onerror = () => rapperElements[rapperIndex].classList.remove("speaking");
-    speechSynthesis.speak(speech);
+    return window.speechSynthesis.getVoices() || [];
+
 }
+
+
+function pickVoice(
+    list,
+    preferredNames
+) {
+
+    for (
+        const name of preferredNames
+    ) {
+
+        const found =
+            list.find(
+                voice =>
+                    voice.name
+                        .toLowerCase()
+                        .includes(
+                            name.toLowerCase()
+                        )
+            );
+
+        if (
+            found
+        ) {
+
+            return found;
+
+        }
+
+    }
+
+    return null;
+
+}
+
+
+function loadVoices() {
+
+    if (
+        !("speechSynthesis" in window)
+    ) {
+
+        console.warn(
+            "This browser does not support speechSynthesis."
+        );
+
+        return;
+
+    }
+
+    voices =
+        getAvailableVoices();
+
+    if (
+        voices.length === 0
+    ) {
+
+        return;
+
+    }
+
+    const english =
+        voices.filter(
+            voice =>
+                voice.lang &&
+                voice.lang
+                    .toLowerCase()
+                    .startsWith("en")
+        );
+
+    const pool =
+        english.length
+        ? english
+        : voices;
+
+    rapperVoices[0] =
+        pickVoice(
+            pool,
+            [
+                "David",
+                "Daniel",
+                "Alex",
+                "Aaron",
+                "Google UK English Male",
+                "English United States"
+            ]
+        )
+        ||
+        pool[0]
+        ||
+        null;
+
+    rapperVoices[1] =
+        pickVoice(
+            pool,
+            [
+                "Zira",
+                "Samantha",
+                "Karen",
+                "Moira",
+                "Google UK English Female",
+                "English Australia"
+            ]
+        )
+        ||
+        pool.find(
+            voice =>
+                rapperVoices[0]
+                ? voice.name !==
+                  rapperVoices[0].name
+                : true
+        )
+        ||
+        pool[0]
+        ||
+        null;
+
+    console.log(
+        "TTS voices:",
+        rapperVoices[0]?.name || "default",
+        "|",
+        rapperVoices[1]?.name || "default"
+    );
+
+}
+
+
+loadVoices();
+
+
+if (
+    "speechSynthesis" in window
+) {
+
+    window.speechSynthesis.onvoiceschanged =
+        loadVoices;
+
+}
+
+
+/*
+Mobile browsers can expose their voice list late.
+Retry for a few seconds.
+*/
+
+let voiceLoadAttempts = 0;
+
+const voiceLoadTimer =
+    setInterval(
+        () => {
+
+            voiceLoadAttempts++;
+
+            if (
+                voices.length === 0
+            ) {
+
+                loadVoices();
+
+            }
+
+            if (
+                voices.length > 0 ||
+                voiceLoadAttempts >= 20
+            ) {
+
+                clearInterval(
+                    voiceLoadTimer
+                );
+
+            }
+
+        },
+        250
+    );
+
+
+/* ============================================================
+   MOBILE TTS UNLOCK
+============================================================ */
+
+function unlockTTS() {
+
+    if (
+        ttsUnlocked ||
+        !("speechSynthesis" in window)
+    ) {
+
+        return;
+
+    }
+
+    try {
+
+        loadVoices();
+
+        const synth =
+            window.speechSynthesis;
+
+        synth.cancel();
+        synth.resume();
+
+        /*
+        First speech request happens directly from
+        the Start tap, which is important on mobile.
+        */
+
+        const unlock =
+            new SpeechSynthesisUtterance(
+                "."
+            );
+
+        unlock.volume =
+            0;
+
+        unlock.rate =
+            2;
+
+        if (
+            rapperVoices[0]
+        ) {
+
+            unlock.voice =
+                rapperVoices[0];
+
+        }
+
+        synth.speak(
+            unlock
+        );
+
+        ttsUnlocked =
+            true;
+
+        console.log(
+            "TTS UNLOCKED"
+        );
+
+    }
+
+    catch (
+        error
+    ) {
+
+        console.warn(
+            "TTS unlock failed:",
+            error
+        );
+
+    }
+
+}
+
+
+/* ============================================================
+   MOBILE-SAFE SPEECH
+============================================================ */
+
+function speakLine(
+    text,
+    rapperIndex
+) {
+
+    if (
+        !("speechSynthesis" in window)
+    ) {
+
+        return;
+
+    }
+
+    if (
+        voices.length === 0
+    ) {
+
+        loadVoices();
+
+    }
+
+    const synth =
+        window.speechSynthesis;
+
+    rapperElements.forEach(
+        rapper =>
+            rapper.classList.remove(
+                "speaking"
+            )
+    );
+
+    /*
+    Don't let speech pile up behind the beat.
+    */
+
+    if (
+        synth.speaking ||
+        synth.pending
+    ) {
+
+        synth.cancel();
+
+    }
+
+    synth.resume();
+
+    const speech =
+        new SpeechSynthesisUtterance(
+            text
+        );
+
+    currentUtterance =
+        speech;
+
+    /*
+    If mobile has no exposed voice list,
+    do not fail: use the browser default.
+    */
+
+    if (
+        rapperVoices[
+            rapperIndex
+        ]
+    ) {
+
+        speech.voice =
+            rapperVoices[
+                rapperIndex
+            ];
+
+        speech.lang =
+            rapperVoices[
+                rapperIndex
+            ].lang ||
+            "en-US";
+
+    }
+
+    else {
+
+        speech.lang =
+            "en-US";
+
+    }
+
+    if (
+        rapperIndex === 0
+    ) {
+
+        speech.rate =
+            1.85;
+
+        speech.pitch =
+            0.78;
+
+    }
+
+    else {
+
+        speech.rate =
+            1.80;
+
+        speech.pitch =
+            1.12;
+
+    }
+
+    speech.volume =
+        1;
+
+    speech.onstart =
+        () => {
+
+            rapperElements[
+                rapperIndex
+            ].classList.add(
+                "speaking"
+            );
+
+        };
+
+    speech.onend =
+        () => {
+
+            rapperElements[
+                rapperIndex
+            ].classList.remove(
+                "speaking"
+            );
+
+            if (
+                currentUtterance ===
+                speech
+            ) {
+
+                currentUtterance =
+                    null;
+
+            }
+
+        };
+
+    speech.onerror =
+        event => {
+
+            rapperElements[
+                rapperIndex
+            ].classList.remove(
+                "speaking"
+            );
+
+            if (
+                event.error !==
+                    "interrupted" &&
+                event.error !==
+                    "canceled"
+            ) {
+
+                console.warn(
+                    "TTS error:",
+                    event.error
+                );
+
+            }
+
+        };
+
+    /*
+    On some mobile engines, speak() immediately
+    after cancel() is ignored. A tiny delay fixes it.
+    */
+
+    setTimeout(
+        () => {
+
+            try {
+
+                synth.resume();
+
+                synth.speak(
+                    speech
+                );
+
+            }
+
+            catch (
+                error
+            ) {
+
+                console.warn(
+                    "Could not speak line:",
+                    error
+                );
+
+            }
+
+        },
+        35
+    );
+
+}
+
+
+/* ============================================================
+   ACTIVE RAPPER UI
+============================================================ */
 
 function setActiveRapper(rapperIndex) {
     rapperElements.forEach((rapper, index) => {
@@ -1430,6 +1886,11 @@ startScreen.addEventListener(
 
     async () => {
 
+        /*
+        Unlock mobile TTS directly from this tap.
+        */
+        unlockTTS();
+
         if (
             started
         ) {
@@ -1580,6 +2041,46 @@ music.addEventListener(
     }
 
 );
+
+
+/* ============================================================
+   MOBILE TAB / APP RESUME
+============================================================ */
+
+document.addEventListener(
+    "visibilitychange",
+    () => {
+
+        if (
+            document.visibilityState ===
+                "visible" &&
+            "speechSynthesis" in window
+        ) {
+
+            window.speechSynthesis.resume();
+            loadVoices();
+
+        }
+
+    }
+);
+
+window.addEventListener(
+    "pageshow",
+    () => {
+
+        if (
+            "speechSynthesis" in window
+        ) {
+
+            window.speechSynthesis.resume();
+            loadVoices();
+
+        }
+
+    }
+);
+
 
 music.addEventListener(
 
