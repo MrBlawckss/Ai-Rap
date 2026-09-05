@@ -615,7 +615,7 @@ function speakLine(text, rapperIndex) {
         speech.pitch = 1.15;
     }
 
-    speech.volume = 1;
+    speech.volume = 0.7;
     speech.onstart = () => rapperElements[rapperIndex].classList.add("speaking");
     speech.onend = () => rapperElements[rapperIndex].classList.remove("speaking");
     speech.onerror = () => rapperElements[rapperIndex].classList.remove("speaking");
