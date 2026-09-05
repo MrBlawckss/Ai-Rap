@@ -313,10 +313,28 @@ body {
     z-index: 200;
     font-family: Consolas, monospace;
 }
+
+#bassFlash {
+    position: fixed;
+    inset: 0;
+    background: white;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 99998;
+    transition: opacity 0.10s ease-out;
+}
+
+#bassFlash.hit {
+    opacity: 0.8;
+    transition: opacity 0s;
+}
+
 </style>
 </head>
 
 <body>
+
+<div id="bassFlash"></div>
 
 <div id="startScreen">Start</div>
 
@@ -495,6 +513,11 @@ const barCounter =
 const debugText =
     document.getElementById(
         "debugText"
+    );
+
+const bassFlash =
+    document.getElementById(
+        "bassFlash"
     );
 
 const rapperElements = [
@@ -1323,6 +1346,86 @@ function flashBeat() {
 }
 
 
+
+let lastBassKickTime = 0;
+
+function triggerBassKickEffect() {
+
+    const now =
+        performance.now();
+
+    /*
+    Prevent rapid retriggering from one long bass hit.
+    */
+    if (
+        now -
+        lastBassKickTime <
+        180
+    ) {
+
+        return;
+
+    }
+
+    lastBassKickTime =
+        now;
+
+    /*
+    WHITE FLASH:
+    80% visible instantly, then fade away fast.
+    */
+
+    bassFlash.classList.remove(
+        "hit"
+    );
+
+    void bassFlash.offsetWidth;
+
+    bassFlash.classList.add(
+        "hit"
+    );
+
+    setTimeout(
+        () => {
+
+            bassFlash.classList.remove(
+                "hit"
+            );
+
+        },
+        20
+    );
+
+    /*
+    SCREEN PUNCH:
+    +10% scale and a brief 10% blur-ish pulse.
+    */
+
+    page.style.transition =
+        "transform 0.08s ease-out, filter 0.08s ease-out";
+
+    page.style.transform =
+        "scale(1.10)";
+
+    page.style.filter =
+        "blur(1px)";
+
+    setTimeout(
+        () => {
+
+            page.style.transform =
+                "scale(1)";
+
+            page.style.filter =
+                "blur(0px)";
+
+        },
+        90
+    );
+
+}
+
+
 /* ============================================================
    AUDIO VISUALIZER
 ============================================================ */
@@ -1729,27 +1832,17 @@ function drawVisualizer() {
 
         : 0;
 
+    /*
+    Strong low-frequency hit detection.
+    Trigger the visual kick effect on bass peaks.
+    */
+
     if (
         bass >
-        0.42
+        0.46
     ) {
 
-        const pulse =
-            1 +
-            (
-                bass *
-                0.006
-            );
-
-        page.style.transform =
-            `scale(${pulse})`;
-
-    }
-
-    else {
-
-        page.style.transform =
-            "scale(1)";
+        triggerBassKickEffect();
 
     }
 
