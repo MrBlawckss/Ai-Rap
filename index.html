@@ -7,205 +7,289 @@
 <title>Infinite AI Rap Battle</title>
 
 <style>
-    * {
-        box-sizing: border-box;
-    }
+* {
+    box-sizing: border-box;
+}
 
-    body {
-        margin: 0;
-        background: #090909;
-        color: white;
-        font-family: Arial, Helvetica, sans-serif;
-        height: 100vh;
-        overflow: hidden;
-    }
+html,
+body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    background: #090909;
+    color: white;
+    font-family: Arial, Helvetica, sans-serif;
+    overflow: hidden;
+}
 
-    .topbar {
-        height: 70px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 0 25px;
-        background: #111;
-        border-bottom: 1px solid #333;
-    }
+#startScreen {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
 
-    .title {
-        font-size: 24px;
-        font-weight: bold;
-    }
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-    .bpm {
-        font-size: 14px;
-        opacity: 0.65;
-    }
+    background: #090909;
+    color: white;
 
-    .battle {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        height: calc(100vh - 70px);
-    }
+    font-size: clamp(64px, 12vw, 180px);
+    font-weight: 900;
 
-    .rapper {
-        position: relative;
-        padding: 30px;
-        overflow: hidden;
-        transition: 0.15s;
-    }
+    cursor: pointer;
+    user-select: none;
+}
 
-    .rapper:first-child {
-        border-right: 1px solid #333;
-    }
+#startScreen:hover {
+    background: #111;
+}
 
-    .rapper.active {
-        background: #131313;
-    }
+.topbar {
+    height: 70px;
 
-    .rapper-name {
-        font-size: 32px;
-        font-weight: 900;
-        margin-bottom: 30px;
-    }
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 
-    .status {
-        position: absolute;
-        top: 35px;
-        right: 30px;
-        font-size: 13px;
-        opacity: 0.5;
-    }
+    padding: 0 24px;
 
-    .active .status {
+    background: #111;
+    border-bottom: 1px solid #333;
+}
+
+.title {
+    font-size: 24px;
+    font-weight: 900;
+}
+
+.bpm {
+    font-size: 14px;
+    opacity: 0.6;
+}
+
+.battle {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+
+    height: calc(100vh - 70px);
+}
+
+.rapper {
+    position: relative;
+
+    padding: 30px;
+
+    overflow: hidden;
+
+    transition: background 0.15s;
+}
+
+.rapper:first-child {
+    border-right: 1px solid #333;
+}
+
+.rapper.active {
+    background: #151515;
+}
+
+.rapper-name {
+    font-size: 34px;
+    font-weight: 900;
+
+    margin-bottom: 30px;
+}
+
+.status {
+    position: absolute;
+
+    top: 36px;
+    right: 30px;
+
+    font-size: 13px;
+
+    opacity: 0.45;
+}
+
+.rapper.active .status {
+    opacity: 1;
+}
+
+.lyrics {
+    display: flex;
+    flex-direction: column;
+
+    gap: 18px;
+
+    font-size: 24px;
+    line-height: 1.4;
+}
+
+.line {
+    opacity: 0;
+
+    transform: translateY(12px);
+
+    animation: appear 0.25s forwards;
+}
+
+.line.old {
+    opacity: 0.25;
+}
+
+@keyframes appear {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.beat {
+    position: fixed;
+
+    bottom: 20px;
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    width: 10px;
+    height: 10px;
+
+    border-radius: 50%;
+
+    background: white;
+
+    opacity: 0.2;
+}
+
+.beat.hit {
+    animation: beatPulse 0.15s;
+}
+
+@keyframes beatPulse {
+    0% {
+        transform: translateX(-50%) scale(2.3);
         opacity: 1;
     }
 
-    .lyrics {
-        display: flex;
-        flex-direction: column;
-        gap: 18px;
-        font-size: 23px;
-        line-height: 1.4;
-    }
-
-    .line {
-        opacity: 0;
-        transform: translateY(12px);
-        animation: appear 0.25s forwards;
-    }
-
-    .old {
-        opacity: 0.25;
-    }
-
-    @keyframes appear {
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    .beat {
-        position: fixed;
-        bottom: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-        background: white;
+    100% {
+        transform: translateX(-50%) scale(1);
         opacity: 0.2;
     }
-
-    .beat.hit {
-        animation: beat 0.15s;
-    }
-
-    @keyframes beat {
-        0% {
-            transform: translateX(-50%) scale(2.2);
-            opacity: 1;
-        }
-
-        100% {
-            transform: translateX(-50%) scale(1);
-            opacity: 0.2;
-        }
-    }
-
-    #audioNotice {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        background: #181818;
-        border: 1px solid #333;
-        border-radius: 8px;
-        padding: 10px 14px;
-        font-size: 12px;
-        opacity: 0.7;
-        cursor: pointer;
-    }
-
-    #audioNotice:hover {
-        opacity: 1;
-    }
+}
 </style>
 </head>
 
 <body>
 
+<div id="startScreen">
+    Start
+</div>
+
 <div class="topbar">
-    <div class="title">INFINITE RAP BATTLE</div>
-    <div class="bpm">100 BPM • NO ESCAPE</div>
+
+    <div class="title">
+        INFINITE RAP BATTLE
+    </div>
+
+    <div class="bpm">
+        100 BPM
+    </div>
+
 </div>
 
 <div class="battle">
 
-    <div class="rapper active" id="rapper0">
-        <div class="rapper-name">MC BYTE</div>
-        <div class="status">RAPPING</div>
+    <div class="rapper" id="rapper0">
+
+        <div class="rapper-name">
+            MC BYTE
+        </div>
+
+        <div class="status">
+            WAITING
+        </div>
+
         <div class="lyrics" id="lyrics0"></div>
+
     </div>
 
     <div class="rapper" id="rapper1">
-        <div class="rapper-name">GPT DAWG</div>
-        <div class="status">WAITING</div>
+
+        <div class="rapper-name">
+            GPT DAWG
+        </div>
+
+        <div class="status">
+            WAITING
+        </div>
+
         <div class="lyrics" id="lyrics1"></div>
+
     </div>
 
 </div>
 
-<div class="beat" id="beat"></div>
+<div class="beat" id="beatDot"></div>
 
-<div id="audioNotice">
-    CLICK FOR BEAT
-</div>
-
-<audio id="music" loop>
-    <source src="beat.mp3" type="audio/mpeg">
+<audio
+    id="music"
+    src="rapsong.mp3"
+    preload="auto">
 </audio>
 
 <script>
 
-/* =========================================================
+/* ============================
    TIMING
-========================================================= */
+============================ */
 
 const BPM = 100;
 
 const BEAT_MS = 60000 / BPM;
-// 100 BPM = 600ms
+// 600ms
 
 const BEATS_PER_BAR = 4;
 
 const BAR_MS = BEAT_MS * BEATS_PER_BAR;
-// 2400ms per line
+// 2400ms
+
+const RAP_START_DELAY = BAR_MS * 2;
+// 4800ms
+// Bar 1 starts at 0.0
+// Bar 2 starts at 2.4
+// Bar 3 starts at 4.8
 
 const BARS_PER_TURN = 4;
 
 
-/* =========================================================
-   WORD BANKS
-========================================================= */
+/* ============================
+   ELEMENTS
+============================ */
+
+const startScreen =
+    document.getElementById("startScreen");
+
+const music =
+    document.getElementById("music");
+
+const beatDot =
+    document.getElementById("beatDot");
+
+const rapperElements = [
+    document.getElementById("rapper0"),
+    document.getElementById("rapper1")
+];
+
+const lyricsElements = [
+    document.getElementById("lyrics0"),
+    document.getElementById("lyrics1")
+];
+
+
+/* ============================
+   RAP DATA
+============================ */
 
 const subjects = [
     "your haircut",
@@ -226,66 +310,34 @@ const subjects = [
     "your maths grade"
 ];
 
-const starters = [
-    "Bro walked in talking like",
-    "You're standing there looking like",
-    "Man really showed up with",
-    "I saw you yesterday with",
-    "Nobody asked but you brought",
-    "You entered the room carrying",
-    "You've got the confidence of",
-    "Bro thinks he's dangerous with",
-    "You're acting powerful with",
-    "I can't believe you actually own"
-];
-
 const weirdObjects = [
-    "a microwave",
-    "three spoons",
-    "a broken printer",
-    "a suspicious banana",
-    "one AA battery",
-    "a plastic chair",
-    "half a sandwich",
-    "an expired coupon",
-    "a traffic cone",
-    "a Minecraft torch",
-    "a school-issued mouse",
-    "a wet sock",
-    "a single crouton",
-    "a Windows Vista laptop",
-    "a cardboard sword",
-    "a USB from 2009"
+    "microwave",
+    "spoon",
+    "printer",
+    "banana",
+    "battery",
+    "chair",
+    "sandwich",
+    "traffic cone",
+    "Minecraft torch",
+    "wet sock",
+    "crouton",
+    "cardboard sword",
+    "school mouse",
+    "broken charger",
+    "empty lunchbox"
 ];
 
 const reactions = [
-    "that's tragic",
-    "that's criminal",
-    "that's unbelievable",
-    "that's embarrassing",
-    "that's concerning",
-    "that's outrageous",
-    "that's unfortunate",
-    "that's catastrophic",
-    "that's suspicious",
-    "that's diabolical"
+    "tragic",
+    "criminal",
+    "embarrassing",
+    "concerning",
+    "outrageous",
+    "suspicious",
+    "diabolical",
+    "painful"
 ];
-
-const flexes = [
-    "I'm cooking this beat",
-    "I'm breaking the meter",
-    "I'm owning this round",
-    "I'm stealing the show",
-    "I'm carrying the track",
-    "I'm smoking this verse",
-    "I'm running this stage",
-    "I'm bending the rhythm"
-];
-
-
-/* =========================================================
-   RHYME GROUPS
-========================================================= */
 
 const rhymeGroups = [
 
@@ -297,9 +349,7 @@ const rhymeGroups = [
         "sight",
         "bright",
         "flight",
-        "tight",
-        "height",
-        "bite"
+        "tight"
     ],
 
     [
@@ -310,9 +360,7 @@ const rhymeGroups = [
         "chain",
         "plane",
         "drain",
-        "lane",
-        "gain",
-        "main"
+        "lane"
     ],
 
     [
@@ -323,9 +371,7 @@ const rhymeGroups = [
         "known",
         "grown",
         "throne",
-        "clone",
-        "bone",
-        "alone"
+        "clone"
     ],
 
     [
@@ -336,8 +382,6 @@ const rhymeGroups = [
         "cool",
         "rule",
         "stool",
-        "mule",
-        "jewel",
         "fuel"
     ],
 
@@ -349,9 +393,7 @@ const rhymeGroups = [
         "mean",
         "machine",
         "canteen",
-        "routine",
-        "marine",
-        "bean"
+        "routine"
     ],
 
     [
@@ -362,9 +404,7 @@ const rhymeGroups = [
         "bear",
         "square",
         "rare",
-        "glare",
-        "wear",
-        "care"
+        "glare"
     ],
 
     [
@@ -375,139 +415,88 @@ const rhymeGroups = [
         "shock",
         "knock",
         "stock",
-        "lock",
-        "dock",
-        "mock"
+        "lock"
     ]
 
 ];
 
 
-/* =========================================================
+/* ============================
    HELPERS
-========================================================= */
+============================ */
 
 function random(array) {
-    return array[Math.floor(Math.random() * array.length)];
+
+    return array[
+        Math.floor(
+            Math.random() * array.length
+        )
+    ];
+
 }
 
-function randomRhymeGroup() {
-    return [...random(rhymeGroups)];
-}
+function newRhymeGroup() {
 
-function takeRandom(array) {
+    return [
+        ...random(rhymeGroups)
+    ];
 
-    if (array.length === 0) {
-        return "bro";
-    }
-
-    const index = Math.floor(Math.random() * array.length);
-
-    return array.splice(index, 1)[0];
-}
-
-
-/* =========================================================
-   BAR GENERATION
-========================================================= */
-
-function makeBar(rapper, rhymeWord, previousBar) {
-
-    const enemy =
-        rapper === 0
-        ? "GPT Dawg"
-        : "MC Byte";
-
-    const type = Math.floor(Math.random() * 8);
-
-    switch (type) {
-
-        case 0:
-            return `${random(starters)} ${random(weirdObjects)}, ${rhymeWord}`;
-
-        case 1:
-            return `${enemy}, ${random(subjects)} got me questioning my ${rhymeWord}`;
-
-        case 2:
-            return `${random(flexes)}, while you're arguing with a ${rhymeWord}`;
-
-        case 3:
-            return `You called that a verse? ${random(reactions)}, ${rhymeWord}`;
-
-        case 4:
-            return `Bro got ${random(weirdObjects)} and somehow calls it ${rhymeWord}`;
-
-        case 5:
-            return `I entered the room and your confidence lost its ${rhymeWord}`;
-
-        case 6:
-            return `You tried to roast me but accidentally complimented my ${rhymeWord}`;
-
-        case 7:
-
-            if (previousBar) {
-
-                const words = previousBar.split(" ");
-
-                const picked =
-                    words[Math.floor(Math.random() * words.length)]
-                    .replace(/[^\w]/g, "");
-
-                return `You really said "${picked}" and expected me not to say ${rhymeWord}`;
-            }
-
-            return `Nobody knows what's happening but somehow I rhyme ${rhymeWord}`;
-    }
 }
 
 
-/* =========================================================
-   UI
-========================================================= */
-
-const rapperElements = [
-    document.getElementById("rapper0"),
-    document.getElementById("rapper1")
-];
-
-const lyricsElements = [
-    document.getElementById("lyrics0"),
-    document.getElementById("lyrics1")
-];
+/* ============================
+   STATE
+============================ */
 
 let currentRapper = 0;
 
-let barNumber = 0;
+let currentBar = 0;
 
-let rhymeWords = randomRhymeGroup();
+let rhymeWords = newRhymeGroup();
 
-let previousBar = "";
+let previousLine = "";
+
+let started = false;
+
+let rapInterval = null;
+
+let beatInterval = null;
 
 
+/* ============================
+   UI
+============================ */
 
 function setActiveRapper(index) {
 
-    rapperElements.forEach((el, i) => {
+    rapperElements.forEach(
+        (rapper, i) => {
 
-        el.classList.toggle(
-            "active",
-            i === index
-        );
+            rapper.classList.toggle(
+                "active",
+                i === index
+            );
 
-        el.querySelector(".status").textContent =
-            i === index
-            ? "RAPPING"
-            : "WAITING";
-    });
+            const status =
+                rapper.querySelector(".status");
+
+            status.textContent =
+                i === index
+                ? "RAPPING"
+                : "WAITING";
+
+        }
+    );
+
 }
 
+function addLine(rapperIndex, text) {
 
+    const container =
+        lyricsElements[rapperIndex];
 
-function addLine(rapper, text) {
-
-    const container = lyricsElements[rapper];
-
-    const line = document.createElement("div");
+    const line =
+        document.createElement("div");
 
     line.className = "line";
 
@@ -519,53 +508,148 @@ function addLine(rapper, text) {
     const lines =
         container.querySelectorAll(".line");
 
-    if (lines.length > 6) {
 
-        lines[0].classList.add("old");
+    if (lines.length > 5) {
+
+        lines[
+            lines.length - 6
+        ].classList.add("old");
 
     }
+
 
     if (lines.length > 8) {
 
         lines[0].remove();
 
     }
+
 }
 
 
-/* =========================================================
+/* ============================
+   RAP GENERATION
+============================ */
+
+function generateLine(rhymeWord) {
+
+    const enemy =
+        currentRapper === 0
+        ? "GPT Dawg"
+        : "MC Byte";
+
+    const type =
+        Math.floor(
+            Math.random() * 10
+        );
+
+    switch (type) {
+
+        case 0:
+
+            return `${enemy}, ${random(subjects)} looking rough in the ${rhymeWord}`;
+
+        case 1:
+
+            return `Bro pulled up holding a ${random(weirdObjects)}, calling it ${rhymeWord}`;
+
+        case 2:
+
+            return `You dropped that verse and somehow damaged the ${rhymeWord}`;
+
+        case 3:
+
+            return `${enemy} started cooking then immediately burnt the ${rhymeWord}`;
+
+        case 4:
+
+            return `That last bar was ${random(reactions)}, go apologise to the ${rhymeWord}`;
+
+        case 5:
+
+            return `Your whole rap career just disconnected from the ${rhymeWord}`;
+
+        case 6:
+
+            return `Bro got ${random(subjects)} and still thinks he owns the ${rhymeWord}`;
+
+        case 7:
+
+            return `I heard that flow and immediately blamed the ${rhymeWord}`;
+
+        case 8:
+
+            return `You tried to roast me but somehow complimented my ${rhymeWord}`;
+
+        case 9:
+
+            if (previousLine) {
+
+                const words =
+                    previousLine
+                    .split(" ")
+                    .map(word =>
+                        word.replace(
+                            /[^a-zA-Z]/g,
+                            ""
+                        )
+                    )
+                    .filter(Boolean);
+
+                const picked =
+                    random(words);
+
+                return `Bro really said "${picked}" and thought that would save his ${rhymeWord}`;
+
+            }
+
+            return `Nobody knows what's happening, including the ${rhymeWord}`;
+
+    }
+
+}
+
+
+/* ============================
    RAP LOOP
-========================================================= */
+============================ */
 
 function rapBar() {
 
-    if (rhymeWords.length < 1) {
-        rhymeWords = randomRhymeGroup();
+    if (rhymeWords.length === 0) {
+
+        rhymeWords =
+            newRhymeGroup();
+
     }
 
-    const rhymeWord =
-        takeRandom(rhymeWords);
 
-    const bar =
-        makeBar(
-            currentRapper,
-            rhymeWord,
-            previousBar
+    const rhymeWord =
+        rhymeWords.shift();
+
+
+    const line =
+        generateLine(
+            rhymeWord
         );
+
 
     addLine(
         currentRapper,
-        bar
+        line
     );
 
-    previousBar = bar;
 
-    barNumber++;
+    previousLine = line;
+
+    currentBar++;
 
 
-    if (barNumber >= BARS_PER_TURN) {
+    if (
+        currentBar >= BARS_PER_TURN
+    ) {
 
-        barNumber = 0;
+        currentBar = 0;
 
         currentRapper =
             currentRapper === 0
@@ -573,58 +657,48 @@ function rapBar() {
             : 0;
 
         rhymeWords =
-            randomRhymeGroup();
+            newRhymeGroup();
 
         setActiveRapper(
             currentRapper
         );
+
     }
+
 }
 
 
-/* START IMMEDIATELY */
-
-setActiveRapper(0);
-
-rapBar();
-
-setInterval(
-    rapBar,
-    BAR_MS
-);
-
-
-/* =========================================================
+/* ============================
    BEAT FLASH
-========================================================= */
+============================ */
 
-const beatDot =
-    document.getElementById("beat");
+function flashBeat() {
 
-setInterval(() => {
-
-    beatDot.classList.remove("hit");
+    beatDot.classList.remove(
+        "hit"
+    );
 
     void beatDot.offsetWidth;
 
-    beatDot.classList.add("hit");
+    beatDot.classList.add(
+        "hit"
+    );
 
-}, BEAT_MS);
+}
 
 
-/* =========================================================
-   MUSIC
-========================================================= */
+/* ============================
+   START
+============================ */
 
-const music =
-    document.getElementById("music");
-
-const audioNotice =
-    document.getElementById("audioNotice");
-
-audioNotice.addEventListener(
+startScreen.addEventListener(
     "click",
     async () => {
+
+        if (started) {
+            return;
+        }
+
 
         try {
 
@@ -632,14 +706,66 @@ audioNotice.addEventListener(
 
             await music.play();
 
-            audioNotice.style.display =
+            started = true;
+
+
+            startScreen.style.display =
                 "none";
+
+
+            /* Start visual beat immediately */
+
+            flashBeat();
+
+            beatInterval =
+                setInterval(
+                    flashBeat,
+                    BEAT_MS
+                );
+
+
+            /* Bar 1 = music only
+               Bar 2 = music only
+               Bar 3 = rapper starts */
+
+            setTimeout(
+                () => {
+
+                    currentRapper = 0;
+
+                    currentBar = 0;
+
+                    rhymeWords =
+                        newRhymeGroup();
+
+                    setActiveRapper(0);
+
+
+                    rapBar();
+
+
+                    rapInterval =
+                        setInterval(
+                            rapBar,
+                            BAR_MS
+                        );
+
+                },
+                RAP_START_DELAY
+            );
 
         }
 
         catch (error) {
 
-            console.log(error);
+            console.error(
+                "Could not play rapsong.mp3:",
+                error
+            );
+
+            alert(
+                "rapsong.mp3 could not be played. Make sure it is in the same folder as index.html."
+            );
 
         }
 
@@ -647,14 +773,21 @@ audioNotice.addEventListener(
 );
 
 
-/*
-Browsers usually block audio autoplay.
+/* ============================
+   AUDIO ERROR CHECK
+============================ */
 
-The RAP starts instantly.
+music.addEventListener(
+    "error",
+    () => {
 
-The beat starts when the user clicks
-"CLICK FOR BEAT".
-*/
+        console.error(
+            "Audio loading error:",
+            music.error
+        );
+
+    }
+);
 
 </script>
 
