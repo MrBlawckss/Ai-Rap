@@ -1348,6 +1348,7 @@ function flashBeat() {
 
 
 let lastBassKickTime = 0;
+let bassKickArmed = true;
 
 function triggerBassKickEffect() {
 
@@ -1833,16 +1834,45 @@ function drawVisualizer() {
         : 0;
 
     /*
-    Strong low-frequency hit detection.
-    Trigger the visual kick effect on bass peaks.
+    ONE TRIGGER PER BASS HIT.
+
+    It only fires when bass crosses the high threshold
+    while armed.
+
+    Then it stays disarmed until bass drops below the
+    lower reset threshold.
+
+    This stops one long "brrrrrrrr" bass sound from
+    repeatedly flashing/punching the screen.
     */
 
+    const BASS_TRIGGER_THRESHOLD =
+        0.46;
+
+    const BASS_RESET_THRESHOLD =
+        0.28;
+
     if (
+        bassKickArmed &&
         bass >
-        0.46
+        BASS_TRIGGER_THRESHOLD
     ) {
 
+        bassKickArmed =
+            false;
+
         triggerBassKickEffect();
+
+    }
+
+    else if (
+        !bassKickArmed &&
+        bass <
+        BASS_RESET_THRESHOLD
+    ) {
+
+        bassKickArmed =
+            true;
 
     }
 
