@@ -199,6 +199,7 @@ body {
     bottom: 0;
 
     height: 130px;
+    z-index: 100;
 
     background:
         linear-gradient(
@@ -308,8 +309,9 @@ body {
     bottom: 140px;
 
     font-size: 11px;
-    opacity: 0.25;
-    z-index: 30;
+    opacity: 0.55;
+    z-index: 200;
+    font-family: Consolas, monospace;
 }
 </style>
 </head>
@@ -417,6 +419,7 @@ body {
     id="music"
     src="./rapsong.mp3"
     preload="auto"
+    crossorigin="anonymous"
     loop
 ></audio>
 
@@ -524,678 +527,264 @@ const lyricsElements = [
 ============================================================ */
 
 const subjects = [
-
-    "your haircut",
-    "your Wi-Fi",
-    "your homework",
-    "your Roblox avatar",
-    "your school bag",
-    "your calculator",
-    "your lunch",
-    "your Chromebook",
-    "your shoes",
-    "your playlist",
-    "your handwriting",
-    "your group project",
-    "your internet",
-    "your chair",
-    "your locker",
-    "your maths grade",
-    "your browser history",
-    "your microphone",
-    "your school laptop",
-    "your lunchbox",
-    "your backpack",
-    "your charger",
-    "your headphones",
-    "your browser tabs",
-    "your desk",
-    "your ringtone",
-    "your keyboard",
-    "your mousepad",
-    "your timetable",
-    "your canteen order"
-
+    "haircut", "Wi-Fi", "homework", "Roblox avatar", "school bag", "calculator",
+    "lunch", "Chromebook", "shoes", "playlist", "handwriting", "group project",
+    "internet", "chair", "locker", "maths grade", "browser history", "microphone",
+    "school laptop", "lunchbox", "backpack", "charger", "headphones", "keyboard",
+    "mouse", "timetable", "canteen order"
 ];
 
 const weirdObjects = [
-
-    "microwave",
-    "spoon",
-    "printer",
-    "banana",
-    "battery",
-    "plastic chair",
-    "sandwich",
-    "traffic cone",
-    "Minecraft torch",
-    "wet sock",
-    "crouton",
-    "cardboard sword",
-    "school mouse",
-    "broken charger",
-    "empty lunchbox",
-    "USB cable",
-    "calculator",
-    "shopping trolley",
-    "ceiling fan",
-    "garden hose",
-    "desk lamp",
-    "toaster",
-    "rubber chicken",
-    "plastic fork",
-    "random brick",
-    "office stapler",
-    "broken keyboard",
-    "water bottle",
-    "one earbud",
-    "half a ruler"
-
+    "microwave", "spoon", "printer", "banana", "battery", "plastic chair",
+    "sandwich", "traffic cone", "Minecraft torch", "wet sock", "crouton",
+    "cardboard sword", "broken charger", "shopping trolley", "ceiling fan",
+    "garden hose", "toaster", "stapler", "water bottle", "half a ruler"
 ];
 
 const reactions = [
-
-    "tragic",
-    "criminal",
-    "embarrassing",
-    "concerning",
-    "outrageous",
-    "suspicious",
-    "diabolical",
-    "painful",
-    "questionable",
-    "disrespectful",
-    "unfortunate",
-    "unrecoverable"
-
+    "tragic", "criminal", "embarrassing", "concerning", "outrageous",
+    "suspicious", "diabolical", "painful", "questionable", "disrespectful"
 ];
 
 const rhymeGroups = [
-
-    [
-        "night",
-        "light",
-        "fight",
-        "right",
-        "sight",
-        "bright",
-        "flight",
-        "tight",
-        "height",
-        "bite"
-    ],
-
-    [
-        "brain",
-        "train",
-        "rain",
-        "pain",
-        "chain",
-        "plane",
-        "drain",
-        "lane",
-        "gain",
-        "main"
-    ],
-
-    [
-        "phone",
-        "cone",
-        "stone",
-        "zone",
-        "known",
-        "grown",
-        "throne",
-        "clone",
-        "bone",
-        "alone"
-    ],
-
-    [
-        "school",
-        "fool",
-        "pool",
-        "tool",
-        "cool",
-        "rule",
-        "stool",
-        "fuel",
-        "jewel",
-        "mule"
-    ],
-
-    [
-        "screen",
-        "green",
-        "clean",
-        "scene",
-        "mean",
-        "machine",
-        "canteen",
-        "routine",
-        "bean",
-        "marine"
-    ],
-
-    [
-        "chair",
-        "hair",
-        "stare",
-        "air",
-        "bear",
-        "square",
-        "rare",
-        "glare",
-        "care",
-        "wear"
-    ],
-
-    [
-        "clock",
-        "rock",
-        "block",
-        "sock",
-        "shock",
-        "knock",
-        "stock",
-        "lock",
-        "dock",
-        "mock"
-    ],
-
-    [
-        "game",
-        "name",
-        "same",
-        "flame",
-        "frame",
-        "claim",
-        "shame",
-        "blame",
-        "fame",
-        "tame"
-    ],
-
-    [
-        "day",
-        "way",
-        "say",
-        "play",
-        "grey",
-        "stay",
-        "tray",
-        "spray",
-        "delay",
-        "display"
-    ],
-
-    [
-        "code",
-        "road",
-        "mode",
-        "load",
-        "node",
-        "showed",
-        "owed",
-        "glowed",
-        "flowed",
-        "explode"
-    ]
-
+    ["night","light","fight","right","sight","bright","flight","tight","height","bite"],
+    ["brain","train","rain","pain","chain","plane","drain","lane","gain","main"],
+    ["phone","cone","stone","zone","known","grown","throne","clone","bone","alone"],
+    ["school","fool","pool","tool","cool","rule","stool","fuel","jewel","mule"],
+    ["screen","green","clean","scene","mean","machine","canteen","routine","bean","marine"],
+    ["chair","hair","stare","air","bear","square","rare","glare","care","wear"],
+    ["clock","rock","block","sock","shock","knock","stock","lock","dock","mock"],
+    ["game","name","same","flame","frame","claim","shame","blame","fame","tame"],
+    ["day","way","say","play","grey","stay","tray","spray","delay","display"],
+    ["code","road","mode","load","node","showed","owed","glowed","flowed","explode"]
 ];
 
-
-/* ============================================================
-   HELPERS
-============================================================ */
-
 function random(array) {
-
-    return array[
-        Math.floor(
-            Math.random() *
-            array.length
-        )
-    ];
-
+    return array[Math.floor(Math.random() * array.length)];
 }
 
 function shuffle(array) {
-
-    const arr =
-        [...array];
-
-    for (
-        let i =
-            arr.length - 1;
-
-        i > 0;
-
-        i--
-    ) {
-
-        const j =
-            Math.floor(
-                Math.random() *
-                (i + 1)
-            );
-
-        [
-            arr[i],
-            arr[j]
-        ] = [
-            arr[j],
-            arr[i]
-        ];
-
+    const arr = [...array];
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
     }
-
     return arr;
-
 }
 
 function newRhymeGroup() {
-
-    return shuffle(
-        random(
-            rhymeGroups
-        )
-    );
-
+    return shuffle(random(rhymeGroups));
 }
 
-
-/* ============================================================
-   STATE
-============================================================ */
-
 let started = false;
-
 let currentRapper = 0;
-
 let rapperBar = 0;
-
-let rhymeWords =
-    newRhymeGroup();
-
+let rhymeWords = newRhymeGroup();
 let previousLine = "";
-
 let lastRapBar = -1;
-
 let lastBeat = -1;
-
 let previousMusicTime = 0;
 
-
-/* ============================================================
-   VOICES
-============================================================ */
-
 let voices = [];
-
-let rapperVoices = [
-    null,
-    null
-];
+let rapperVoices = [null, null];
 
 function loadVoices() {
-
-    voices =
-        speechSynthesis
-        .getVoices();
-
-    const english =
-        voices.filter(
-            voice =>
-                voice.lang
-                .toLowerCase()
-                .startsWith("en")
-        );
-
-    const pool =
-        english.length
-        ? english
-        : voices;
-
-    if (
-        pool.length > 0
-    ) {
-
-        rapperVoices[0] =
-            pool[0];
-
-    }
-
-    if (
-        pool.length > 1
-    ) {
-
-        rapperVoices[1] =
-            pool[1];
-
-    }
-
-    else {
-
-        rapperVoices[1] =
-            pool[0] ||
-            null;
-
-    }
-
+    voices = speechSynthesis.getVoices();
+    const english = voices.filter(v => v.lang.toLowerCase().startsWith("en"));
+    const pool = english.length ? english : voices;
+    if (pool.length > 0) rapperVoices[0] = pool[0];
+    if (pool.length > 1) rapperVoices[1] = pool[1];
+    else rapperVoices[1] = pool[0] || null;
 }
 
 loadVoices();
+speechSynthesis.onvoiceschanged = loadVoices;
 
-speechSynthesis.onvoiceschanged =
-    loadVoices;
-
-
-/* ============================================================
-   TEXT TO SPEECH
-============================================================ */
-
-function speakLine(
-    text,
-    rapperIndex
-) {
-
-    /*
-    Prevent speech from queueing behind.
-    If the previous line is still speaking,
-    kill it and begin the new line now.
-    */
-
+function speakLine(text, rapperIndex) {
     speechSynthesis.cancel();
+    rapperElements.forEach(r => r.classList.remove("speaking"));
 
-    rapperElements.forEach(
-        rapper =>
-            rapper.classList.remove(
-                "speaking"
-            )
-    );
+    const speech = new SpeechSynthesisUtterance(text);
+    if (rapperVoices[rapperIndex]) speech.voice = rapperVoices[rapperIndex];
 
-    const speech =
-        new SpeechSynthesisUtterance(
-            text
-        );
-
-    if (
-        rapperVoices[
-            rapperIndex
-        ]
-    ) {
-
-        speech.voice =
-            rapperVoices[
-                rapperIndex
-            ];
-
+    if (rapperIndex === 0) {
+        speech.rate = 2.05;
+        speech.pitch = 0.72;
+    } else {
+        speech.rate = 2.0;
+        speech.pitch = 1.15;
     }
 
-    /*
-    Different voices.
-    Faster so each bar has a better chance
-    of finishing inside 2.4 seconds.
-    */
-
-    if (
-        rapperIndex === 0
-    ) {
-
-        speech.rate =
-            2.05;
-
-        speech.pitch =
-            0.72;
-
-    }
-
-    else {
-
-        speech.rate =
-            2.00;
-
-        speech.pitch =
-            1.15;
-
-    }
-
-    speech.volume =
-        1;
-
-    speech.onstart =
-        () => {
-
-            rapperElements[
-                rapperIndex
-            ].classList.add(
-                "speaking"
-            );
-
-        };
-
-    speech.onend =
-        () => {
-
-            rapperElements[
-                rapperIndex
-            ].classList.remove(
-                "speaking"
-            );
-
-        };
-
-    speech.onerror =
-        () => {
-
-            rapperElements[
-                rapperIndex
-            ].classList.remove(
-                "speaking"
-            );
-
-        };
-
-    speechSynthesis.speak(
-        speech
-    );
-
+    speech.volume = 1;
+    speech.onstart = () => rapperElements[rapperIndex].classList.add("speaking");
+    speech.onend = () => rapperElements[rapperIndex].classList.remove("speaking");
+    speech.onerror = () => rapperElements[rapperIndex].classList.remove("speaking");
+    speechSynthesis.speak(speech);
 }
 
+function setActiveRapper(rapperIndex) {
+    rapperElements.forEach((rapper, index) => {
+        rapper.classList.toggle("active", index === rapperIndex);
+        rapper.querySelector(".status").textContent = index === rapperIndex ? "RAPPING" : "WAITING";
+    });
+}
 
-/* ============================================================
-   ACTIVE RAPPER UI
-============================================================ */
+function addLine(rapperIndex, text) {
+    const container = lyricsElements[rapperIndex];
 
-function setActiveRapper(
-    rapperIndex
-) {
+    container.querySelectorAll(".line").forEach(line => {
+        line.classList.remove("current");
+        line.classList.add("old");
+    });
 
-    rapperElements.forEach(
-        (rapper, index) => {
+    const line = document.createElement("div");
+    line.className = "line current";
+    line.textContent = text;
+    container.appendChild(line);
 
-            rapper.classList.toggle(
-                "active",
-                index ===
-                rapperIndex
-            );
+    const lines = container.querySelectorAll(".line");
+    if (lines.length > 7) lines[0].remove();
+}
 
-            rapper
-                .querySelector(
-                    ".status"
-                )
-                .textContent =
+const fullBars = [
+    "You rap like your microphone is actively trying to disconnect",
+    "I heard your last verse and lost respect for the English language",
+    "You got all that confidence with absolutely no supporting evidence",
+    "Your flow sounds like a printer getting kicked down a staircase",
+    "You came into this battle like anybody actually invited your ass",
+    "Your bars are so weak even autocorrect stopped trying to help",
+    "You sound like you learned to rap from a terms and conditions page",
+    "Your entire verse had the nutritional value of printer paper",
+    "You got the rhythm of a shopping trolley with one fucked wheel",
+    "That verse was so bad I nearly apologised to the beat",
+    "You rap like your Wi-Fi signal is controlling your breathing",
+    "You got cooked so badly the smoke alarm started harmonising",
+    "You sound like a substitute teacher trying to say slang",
+    "Your flow has the structural integrity of wet cardboard",
+    "I've heard stronger bars from someone reading the school timetable",
+    "You make silence sound like the better musical option",
+    "Your verse had more dead space than a Monday morning classroom",
+    "You talk big for someone whose whole personality needs a software update",
+    "You're not dropping bars, you're dropping the average IQ in the room",
+    "You sound like a toddler dissing a newborn in 2010",
+    "You think you can rap, but all you do is yap",
+    "Your last verse sounded like a Chromebook begging for retirement",
+    "I would call that a diss track but that would disrespect diss tracks",
+    "You sound like your brain is running in battery saver mode",
+    "You entered this battle already looking like the before picture",
+    "Your flow is so confused it needs Google Maps",
+    "You got the confidence of a man who has never listened to himself",
+    "Your whole rap career could fit inside a loading screen tip",
+    "You sound like a YouTube tutorial recorded next to a lawnmower",
+    "Your lyrics got all the flavour of unseasoned school canteen pasta",
+    "You couldn't cook a verse if Gordon Ramsay wrote the fucking thing for you",
+    "That rhyme landed like a chair falling over in a silent classroom",
+    "Your bars are fighting for their lives and losing badly",
+    "I genuinely think the beat is embarrassed to be associated with you",
+    "You rap like you type with one finger",
+    "Your flow has less direction than a Year Eight group project",
+    "You came in swinging and somehow punched yourself",
+    "You sound like someone put an AI model through a school Chromebook speaker",
+    "You're the musical equivalent of clicking the wrong answer with confidence",
+    "Your verse had a beginning, an end, and absolutely nothing worth remembering between them",
+    "You got verbally evicted from your own fucking song",
+    "If bad timing was a person it would ask you for lessons",
+    "You rap like the beat owes you money and refuses to pay",
+    "That delivery was so dry I need a drink after hearing it",
+    "Your best bar just filed for unemployment",
+    "You're built like a final draft that should have stayed in drafts",
+    "Every time you rhyme, somewhere a dictionary closes itself",
+    "You sound like the type to lose an argument with a calculator",
+    "Your whole verse had the energy of three percent battery",
+    "You got absolutely folded and you're still reading from the instructions",
+    "That was not a comeback, that was a system error",
+    "Your flow just got sent to lost property",
+    "I could mute you and the song would gain production value",
+    "You don't need a producer, you need an apology letter",
+    "Your verse sounds like it was generated during a power outage",
+    "You rap like the school Wi-Fi: slow, unreliable, and nobody trusts it",
+    "Your bars came in late and still forgot why they were here",
+    "You couldn't carry this track with a fucking forklift",
+    "That was less of a verse and more of an unfortunate event",
+    "You sound like a ringtone nobody chose",
+    "You brought nothing to this battle except confidence and technical difficulties",
+    "You think you’re peak, but you’re as annoying as a toilet leak.",
+    "Your rhyme scheme just fell down the stairs",
+    "I would roast your flow harder but honestly it's doing enough damage by itself"
+];
 
-                index ===
-                rapperIndex
+const responseBars = [
+    word => `You really said "${word}" like that shit was supposed to save you`,
+    word => `You used "${word}" in a bar and somehow made it sound unemployed`,
+    word => `You said "${word}" with confidence, which honestly made it worse`,
+    word => `The second you said "${word}", the beat tried to leave the room`,
+    word => `You really built an entire line around "${word}" and still fucked it up`,
+    word => `"${word}" was your best idea? Jesus Christ, we're in trouble`,
+    word => `You dropped "${word}" like it was clever and nobody even blinked`,
+    word => `You said "${word}" and somehow lowered the property value of this verse`
+];
 
-                ? "RAPPING"
+const rhymeTemplates = [
+    rhyme => `You stepped to the mic and immediately lost the ${rhyme}`,
+    rhyme => `Your whole career just got dragged through the ${rhyme}`,
+    rhyme => `You call that a verse? I'd rather argue with the ${rhyme}`,
+    rhyme => `That flow was so fucked I had to blame the ${rhyme}`,
+    rhyme => `You walked in talking shit then got folded by the ${rhyme}`,
+    rhyme => `Your last bar was so weak it got bullied by the ${rhyme}`,
+    rhyme => `I heard your whole verse and started praying for the ${rhyme}`,
+    rhyme => `Your rhyme scheme collapsed and landed on the ${rhyme}`,
+    rhyme => `You came here for smoke then got scared of the ${rhyme}`,
+    rhyme => `Your bars got less weight than a fucking ${rhyme}`,
+    rhyme => `Even your own microphone wants nothing to do with the ${rhyme}`,
+    rhyme => `You tried to sound dangerous and got humbled by the ${rhyme}`
+];
 
-                : "WAITING";
+const subjectBars = [
+    (enemy, subject) => `${enemy}, your ${subject} has more personality than your whole damn verse`,
+    (enemy, subject) => `${enemy}, fix your ${subject} before you start talking shit to me`,
+    (enemy, subject) => `${enemy}, even your ${subject} looks embarrassed to be associated with you`,
+    (enemy, subject) => `${enemy}, your ${subject} is carrying your entire fucking reputation`,
+    (enemy, subject) => `${enemy}, your ${subject} has seen better days and so has your flow`
+];
 
+const objectBars = [
+    object => `You got less rhythm than a ${object} rolling down the stairs`,
+    object => `I'd rather hear a ${object} freestyle than another one of your bars`,
+    object => `Your flow sounds like somebody threw a ${object} into a ceiling fan`,
+    object => `You got verbally outperformed by a fucking ${object}`,
+    object => `A ${object} could write a cleaner verse than that shit`
+];
+
+function generateLine(rhymeWord) {
+    const enemy = currentRapper === 0 ? "GPT Dawg" : "MC Byte";
+
+    if (Math.random() < 0.35) {
+        return random(fullBars);
+    }
+
+    if (previousLine && Math.random() < 0.20) {
+        const words = previousLine
+            .split(" ")
+            .map(word => word.replace(/[^a-zA-Z]/g, ""))
+            .filter(word => word.length >= 5);
+
+        if (words.length > 0) {
+            return random(responseBars)(random(words));
         }
-    );
-
-}
-
-
-/* ============================================================
-   ADD LYRIC
-============================================================ */
-
-function addLine(
-    rapperIndex,
-    text
-) {
-
-    const container =
-        lyricsElements[
-            rapperIndex
-        ];
-
-    container
-        .querySelectorAll(
-            ".line"
-        )
-        .forEach(
-            line => {
-
-                line.classList.remove(
-                    "current"
-                );
-
-                line.classList.add(
-                    "old"
-                );
-
-            }
-        );
-
-    const line =
-        document.createElement(
-            "div"
-        );
-
-    line.className =
-        "line current";
-
-    line.textContent =
-        text;
-
-    container.appendChild(
-        line
-    );
-
-    const lines =
-        container.querySelectorAll(
-            ".line"
-        );
-
-    if (
-        lines.length > 7
-    ) {
-
-        lines[0].remove();
-
     }
 
-}
+    const type = Math.floor(Math.random() * 3);
 
-
-/* ============================================================
-   RAP LINE GENERATION
-============================================================ */
-
-function generateLine(
-    rhymeWord
-) {
-
-    const enemy =
-        currentRapper === 0
-        ? "GPT Dawg"
-        : "MC Byte";
-
-    const templates = [
-
-        `${enemy}, your whole verse disappeared into the ${rhymeWord}`,
-
-        `Bro entered the battle holding a ${random(weirdObjects)}, talking about ${rhymeWord}`,
-
-        `You dropped one verse and somehow damaged the ${rhymeWord}`,
-
-        `${enemy} tried cooking and somehow burnt the ${rhymeWord}`,
-
-        `Your ${random(subjects)} has more talent than your ${rhymeWord}`,
-
-        `Bro really brought a ${random(weirdObjects)} and called that ${rhymeWord}`,
-
-        `Your whole career just disconnected from the ${rhymeWord}`,
-
-        `I heard your last bar and immediately blamed the ${rhymeWord}`,
-
-        `You tried roasting me and somehow complimented the ${rhymeWord}`,
-
-        `Your bars got less power than a Chromebook running ${rhymeWord}`,
-
-        `${enemy}, even your ${random(subjects)} wants a refund from the ${rhymeWord}`,
-
-        `Bro said he had bars then pulled out a ${random(weirdObjects)} and yelled ${rhymeWord}`,
-
-        `Your last rhyme was so ${random(reactions)} it frightened the ${rhymeWord}`,
-
-        `You came here confident then got folded by the ${rhymeWord}`,
-
-        `I would roast you harder but your ${random(subjects)} already did the ${rhymeWord}`,
-
-        `Your flow loaded slower than school Wi-Fi in the ${rhymeWord}`
-
-    ];
-
-    if (
-        previousLine &&
-        Math.random() <
-        0.25
-    ) {
-
-        const words =
-            previousLine
-                .split(" ")
-                .map(
-                    word =>
-                        word.replace(
-                            /[^a-zA-Z]/g,
-                            ""
-                        )
-                )
-                .filter(
-                    word =>
-                        word.length > 3
-                );
-
-        if (
-            words.length > 0
-        ) {
-
-            const picked =
-                random(
-                    words
-                );
-
-            return (
-                `You really said ${picked}, now explain that ${rhymeWord}`
-            );
-
-        }
-
+    if (type === 0) {
+        return random(rhymeTemplates)(rhymeWord);
     }
 
-    return random(
-        templates
-    );
+    if (type === 1) {
+        return random(subjectBars)(enemy, random(subjects));
+    }
 
+    return random(objectBars)(random(weirdObjects));
 }
-
 
 /* ============================================================
    RAP BAR
@@ -1309,12 +898,8 @@ let visualizerReady =
 
 function setupAudioVisualizer() {
 
-    if (
-        visualizerReady
-    ) {
-
+    if (visualizerReady) {
         return;
-
     }
 
     audioContext =
@@ -1324,37 +909,34 @@ function setupAudioVisualizer() {
         )();
 
     analyser =
-        audioContext
-        .createAnalyser();
+        audioContext.createAnalyser();
 
-    analyser.fftSize =
-        1024;
-
-    analyser.smoothingTimeConstant =
-        0.78;
+    analyser.fftSize = 2048;
+    analyser.smoothingTimeConstant = 0.72;
+    analyser.minDecibels = -90;
+    analyser.maxDecibels = -10;
 
     frequencyData =
         new Uint8Array(
-            analyser
-            .frequencyBinCount
+            analyser.frequencyBinCount
         );
 
     sourceNode =
-        audioContext
-        .createMediaElementSource(
+        audioContext.createMediaElementSource(
             music
         );
 
-    sourceNode.connect(
-        analyser
-    );
+    sourceNode.connect(analyser);
+    analyser.connect(audioContext.destination);
 
-    analyser.connect(
-        audioContext.destination
-    );
+    visualizerReady = true;
 
-    visualizerReady =
-        true;
+    console.log(
+        "AudioContext:",
+        audioContext.state,
+        "FFT bins:",
+        analyser.frequencyBinCount
+    );
 
 }
 
@@ -1427,14 +1009,12 @@ function drawVisualizer() {
 
     }
 
-    analyser
-        .getByteFrequencyData(
-            frequencyData
-        );
+    analyser.getByteFrequencyData(
+        frequencyData
+    );
 
     const rect =
-        canvas
-        .getBoundingClientRect();
+        canvas.getBoundingClientRect();
 
     const width =
         rect.width;
@@ -1450,26 +1030,69 @@ function drawVisualizer() {
     );
 
     /*
-    Spectrum goes:
-    LEFT = bass / low pitch
-    RIGHT = treble / high pitch
+    Find whether we're actually receiving audio.
+    */
 
-    Colour goes:
-    GREEN -> YELLOW -> ORANGE -> RED
+    let maxValue = 0;
+
+    for (
+        let i = 0;
+        i < frequencyData.length;
+        i++
+    ) {
+
+        if (
+            frequencyData[i] > maxValue
+        ) {
+
+            maxValue =
+                frequencyData[i];
+
+        }
+
+    }
+
+    if (
+        maxValue === 0
+    ) {
+
+        debugText.textContent =
+            "VISUALIZER: AUDIO DATA = 0";
+
+        /*
+        Draw a faint baseline so you can tell
+        the canvas itself is visible.
+        */
+
+        ctx.fillStyle =
+            "rgba(255,255,255,0.12)";
+
+        ctx.fillRect(
+            0,
+            height - 2,
+            width,
+            2
+        );
+
+        return;
+
+    }
+
+    debugText.textContent =
+        "VISUALIZER: OK  " +
+        maxValue;
+
+    /*
+    Real frequency spectrum:
+    left = low frequency
+    right = high frequency
+
+    Use logarithmic spacing because pitch/frequency
+    is much easier to read this way than linear bins.
     */
 
     const BAR_COUNT =
         96;
-
-    const usableBins =
-        Math.min(
-            frequencyData.length,
-            250
-        );
-
-    const step =
-        usableBins /
-        BAR_COUNT;
 
     const gap =
         2;
@@ -1478,25 +1101,61 @@ function drawVisualizer() {
         width /
         BAR_COUNT;
 
-    let bassTotal =
-        0;
+    const nyquist =
+        audioContext.sampleRate /
+        2;
 
-    let bassSamples =
-        0;
+    const minFrequency =
+        35;
+
+    const maxFrequency =
+        Math.min(
+            16000,
+            nyquist
+        );
+
+    let bassTotal = 0;
+    let bassSamples = 0;
 
     for (
         let i = 0;
-
-        i <
-        BAR_COUNT;
-
+        i < BAR_COUNT;
         i++
     ) {
 
+        const ratio =
+            i /
+            (
+                BAR_COUNT -
+                1
+            );
+
+        /*
+        Logarithmic frequency position.
+        */
+
+        const frequency =
+            minFrequency *
+            Math.pow(
+                maxFrequency /
+                minFrequency,
+                ratio
+            );
+
         const binIndex =
-            Math.floor(
-                i *
-                step
+            Math.min(
+                frequencyData.length - 1,
+                Math.max(
+                    0,
+                    Math.round(
+                        frequency /
+                        nyquist *
+                        (
+                            frequencyData.length -
+                            1
+                        )
+                    )
+                )
             );
 
         const value =
@@ -1508,29 +1167,22 @@ function drawVisualizer() {
         const boosted =
             Math.pow(
                 value,
-                0.72
+                0.68
             );
 
         const barHeight =
-            boosted *
-            (
-                height -
-                24
-            );
-
-        const ratio =
-            i /
-            (
-                BAR_COUNT -
-                1
+            Math.max(
+                2,
+                boosted *
+                (
+                    height -
+                    24
+                )
             );
 
         /*
-        HSL hue:
-        120 = green
-        60  = yellow
-        30  = orange
-        0   = red
+        Green -> yellow -> orange -> red
+        from low -> high frequency.
         */
 
         const hue =
@@ -1541,7 +1193,7 @@ function drawVisualizer() {
             );
 
         const color =
-            `hsl(${hue}, 92%, 52%)`;
+            `hsl(${hue}, 95%, 52%)`;
 
         ctx.fillStyle =
             color;
@@ -1570,10 +1222,13 @@ function drawVisualizer() {
 
         );
 
+        /*
+        Rough bass area for screen pulse.
+        */
+
         if (
-            i <
-            BAR_COUNT *
-            0.14
+            frequency <
+            180
         ) {
 
             bassTotal +=
@@ -1596,20 +1251,16 @@ function drawVisualizer() {
 
         : 0;
 
-    /*
-    Slight screen pulse on bass.
-    */
-
     if (
         bass >
-        0.50
+        0.42
     ) {
 
         const pulse =
             1 +
             (
                 bass *
-                0.005
+                0.006
             );
 
         page.style.transform =
@@ -1767,20 +1418,38 @@ startScreen.addEventListener(
 
         try {
 
-            /*
-            IMPORTANT:
-            Start MUSIC FIRST.
+            speechSynthesis.cancel();
 
-            This way if the visualizer fails,
-            the song still plays.
+            /*
+            Set up Web Audio FIRST while this
+            is still directly inside the user click.
             */
 
+            setupAudioVisualizer();
+
+            if (
+                audioContext.state ===
+                "suspended"
+            ) {
+
+                await audioContext.resume();
+
+            }
+
+            console.log(
+                "AudioContext after resume:",
+                audioContext.state
+            );
+
+            resizeVisualizer();
+
             music.pause();
+            music.currentTime = 0;
 
-            music.currentTime =
-                0;
-
-            speechSynthesis.cancel();
+            /*
+            Now play the MP3 through:
+            music -> analyser -> speakers
+            */
 
             await music.play();
 
@@ -1788,33 +1457,20 @@ startScreen.addEventListener(
                 "SONG STARTED"
             );
 
-            /*
-            Reset battle.
-            */
-
-            currentRapper =
-                0;
-
-            rapperBar =
-                0;
+            currentRapper = 0;
+            rapperBar = 0;
 
             rhymeWords =
                 newRhymeGroup();
 
-            previousLine =
-                "";
+            previousLine = "";
 
-            lastRapBar =
-                -1;
+            lastRapBar = -1;
+            lastBeat = -1;
 
-            lastBeat =
-                -1;
+            previousMusicTime = 0;
 
-            previousMusicTime =
-                0;
-
-            started =
-                true;
+            started = true;
 
             startScreen.style.display =
                 "none";
@@ -1827,45 +1483,13 @@ startScreen.addEventListener(
                 syncLoop
             );
 
-            /*
-            Try starting visualizer AFTER music.
-            */
+            requestAnimationFrame(
+                drawVisualizer
+            );
 
-            try {
-
-                setupAudioVisualizer();
-
-                if (
-                    audioContext.state ===
-                    "suspended"
-                ) {
-
-                    await audioContext.resume();
-
-                }
-
-                resizeVisualizer();
-
-                requestAnimationFrame(
-                    drawVisualizer
-                );
-
-                console.log(
-                    "VISUALIZER STARTED"
-                );
-
-            }
-
-            catch (
-                visualizerError
-            ) {
-
-                console.warn(
-                    "Visualizer failed, but music is still playing:",
-                    visualizerError
-                );
-
-            }
+            console.log(
+                "VISUALIZER STARTED"
+            );
 
         }
 
@@ -1874,12 +1498,12 @@ startScreen.addEventListener(
         ) {
 
             console.error(
-                "MUSIC FAILED:",
+                "START FAILED:",
                 error
             );
 
             alert(
-                "rapsong.mp3 could not play. Make sure rapsong.mp3 is in the same folder as index.html."
+                "Could not start the rap battle. Open F12 Console for the exact error."
             );
 
         }
