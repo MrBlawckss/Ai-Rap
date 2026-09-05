@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Infinite AI Rap Battle</title>
 
 <style>
@@ -16,10 +15,10 @@ body {
     margin: 0;
     width: 100%;
     height: 100%;
-    background: #090909;
+    overflow: hidden;
+    background: #080808;
     color: white;
     font-family: Arial, Helvetica, sans-serif;
-    overflow: hidden;
 }
 
 #startScreen {
@@ -31,18 +30,32 @@ body {
     align-items: center;
     justify-content: center;
 
-    background: #090909;
+    background: #080808;
     color: white;
 
-    font-size: clamp(64px, 12vw, 180px);
+    font-size: clamp(70px, 13vw, 190px);
     font-weight: 900;
 
     cursor: pointer;
     user-select: none;
+
+    transition:
+        background 0.2s,
+        letter-spacing 0.2s;
 }
 
 #startScreen:hover {
     background: #111;
+    letter-spacing: 8px;
+}
+
+#page {
+    width: 100%;
+    height: 100%;
+
+    transition:
+        transform 0.08s,
+        filter 0.08s;
 }
 
 .topbar {
@@ -52,7 +65,7 @@ body {
     align-items: center;
     justify-content: space-between;
 
-    padding: 0 24px;
+    padding: 0 25px;
 
     background: #111;
     border-bottom: 1px solid #333;
@@ -61,6 +74,7 @@ body {
 .title {
     font-size: 24px;
     font-weight: 900;
+    letter-spacing: 1px;
 }
 
 .bpm {
@@ -72,7 +86,7 @@ body {
     display: grid;
     grid-template-columns: 1fr 1fr;
 
-    height: calc(100vh - 70px);
+    height: calc(100vh - 70px - 130px);
 }
 
 .rapper {
@@ -82,7 +96,10 @@ body {
 
     overflow: hidden;
 
-    transition: background 0.15s;
+    transition:
+        background 0.15s,
+        transform 0.12s,
+        box-shadow 0.15s;
 }
 
 .rapper:first-child {
@@ -90,25 +107,42 @@ body {
 }
 
 .rapper.active {
-    background: #151515;
+    background: #141414;
+
+    box-shadow:
+        inset 0 0 80px rgba(255,255,255,0.03);
+}
+
+.rapper.speaking {
+    transform: scale(1.008);
 }
 
 .rapper-name {
-    font-size: 34px;
+    font-size: 38px;
     font-weight: 900;
 
     margin-bottom: 30px;
+
+    transition:
+        text-shadow 0.15s,
+        transform 0.15s;
+}
+
+.rapper.active .rapper-name {
+    text-shadow:
+        0 0 18px rgba(255,255,255,0.4);
 }
 
 .status {
     position: absolute;
 
-    top: 36px;
+    top: 39px;
     right: 30px;
 
     font-size: 13px;
+    font-weight: bold;
 
-    opacity: 0.45;
+    opacity: 0.4;
 }
 
 .rapper.active .status {
@@ -122,176 +156,375 @@ body {
     gap: 18px;
 
     font-size: 24px;
-    line-height: 1.4;
+    line-height: 1.35;
 }
 
 .line {
     opacity: 0;
 
-    transform: translateY(12px);
+    transform: translateY(10px);
 
-    animation: appear 0.25s forwards;
+    animation:
+        lineAppear 0.18s forwards;
+
+    transition:
+        opacity 0.25s,
+        transform 0.15s,
+        text-shadow 0.15s;
+}
+
+.line.current {
+    font-weight: bold;
+
+    text-shadow:
+        0 0 12px rgba(255,255,255,0.2);
 }
 
 .line.old {
-    opacity: 0.25;
+    opacity: 0.3 !important;
 }
 
-@keyframes appear {
+@keyframes lineAppear {
     to {
         opacity: 1;
         transform: translateY(0);
     }
 }
 
-.beat {
+#visualizerContainer {
     position: fixed;
 
-    bottom: 20px;
-    left: 50%;
+    left: 0;
+    right: 0;
+    bottom: 0;
 
+    height: 130px;
+
+    background:
+        linear-gradient(
+            to top,
+            #050505,
+            #0b0b0b
+        );
+
+    border-top: 1px solid #333;
+
+    overflow: hidden;
+}
+
+#visualizer {
+    width: 100%;
+    height: 100%;
+
+    display: block;
+}
+
+.frequencyLabel {
+    position: absolute;
+
+    bottom: 5px;
+
+    font-size: 10px;
+
+    opacity: 0.35;
+
+    pointer-events: none;
+}
+
+#lowLabel {
+    left: 10px;
+}
+
+#midLabel {
+    left: 50%;
     transform: translateX(-50%);
+}
+
+#highLabel {
+    right: 10px;
+}
+
+#beatDot {
+    position: fixed;
+
+    left: 50%;
+    bottom: 140px;
 
     width: 10px;
     height: 10px;
+
+    transform: translateX(-50%);
 
     border-radius: 50%;
 
     background: white;
 
     opacity: 0.2;
+
+    z-index: 20;
 }
 
-.beat.hit {
-    animation: beatPulse 0.15s;
+#beatDot.hit {
+    animation:
+        beatHit 0.14s;
 }
 
-@keyframes beatPulse {
+@keyframes beatHit {
     0% {
-        transform: translateX(-50%) scale(2.3);
+        transform:
+            translateX(-50%)
+            scale(2.8);
+
         opacity: 1;
     }
 
     100% {
-        transform: translateX(-50%) scale(1);
+        transform:
+            translateX(-50%)
+            scale(1);
+
         opacity: 0.2;
     }
+}
+
+#barCounter {
+    position: fixed;
+
+    top: 82px;
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    font-size: 12px;
+
+    opacity: 0.35;
+
+    z-index: 50;
+}
+
+#debugText {
+    position: fixed;
+    right: 12px;
+    bottom: 140px;
+
+    font-size: 11px;
+    opacity: 0.25;
+    z-index: 30;
 }
 </style>
 </head>
 
 <body>
 
-<div id="startScreen">
-    Start
+<div id="startScreen">Start</div>
+
+<div id="page">
+
+    <div class="topbar">
+
+        <div class="title">
+            INFINITE RAP BATTLE
+        </div>
+
+        <div class="bpm">
+            100 BPM
+        </div>
+
+    </div>
+
+    <div id="barCounter">
+        BAR 1
+    </div>
+
+    <div class="battle">
+
+        <div
+            class="rapper"
+            id="rapper0"
+        >
+
+            <div class="rapper-name">
+                MC BYTE
+            </div>
+
+            <div class="status">
+                WAITING
+            </div>
+
+            <div
+                class="lyrics"
+                id="lyrics0"
+            ></div>
+
+        </div>
+
+        <div
+            class="rapper"
+            id="rapper1"
+        >
+
+            <div class="rapper-name">
+                GPT DAWG
+            </div>
+
+            <div class="status">
+                WAITING
+            </div>
+
+            <div
+                class="lyrics"
+                id="lyrics1"
+            ></div>
+
+        </div>
+
+    </div>
+
 </div>
 
-<div class="topbar">
+<div id="beatDot"></div>
 
-    <div class="title">
-        INFINITE RAP BATTLE
+<div id="visualizerContainer">
+
+    <canvas id="visualizer"></canvas>
+
+    <div
+        class="frequencyLabel"
+        id="lowLabel"
+    >
+        LOW
     </div>
 
-    <div class="bpm">
-        100 BPM
+    <div
+        class="frequencyLabel"
+        id="midLabel"
+    >
+        MID
     </div>
 
-</div>
-
-<div class="battle">
-
-    <div class="rapper" id="rapper0">
-
-        <div class="rapper-name">
-            MC BYTE
-        </div>
-
-        <div class="status">
-            WAITING
-        </div>
-
-        <div class="lyrics" id="lyrics0"></div>
-
-    </div>
-
-    <div class="rapper" id="rapper1">
-
-        <div class="rapper-name">
-            GPT DAWG
-        </div>
-
-        <div class="status">
-            WAITING
-        </div>
-
-        <div class="lyrics" id="lyrics1"></div>
-
+    <div
+        class="frequencyLabel"
+        id="highLabel"
+    >
+        HIGH
     </div>
 
 </div>
 
-<div class="beat" id="beatDot"></div>
+<div id="debugText"></div>
 
 <audio
     id="music"
-    src="rapsong.mp3"
-    preload="auto">
-</audio>
+    src="./rapsong.mp3"
+    preload="auto"
+    loop
+></audio>
 
 <script>
 
-/* ============================
+/* ============================================================
    TIMING
-============================ */
+============================================================ */
 
 const BPM = 100;
 
-const BEAT_MS = 60000 / BPM;
-// 600ms
+const BEAT_SECONDS =
+    60 / BPM;
 
-const BEATS_PER_BAR = 4;
+/*
+100 BPM:
+1 beat = 0.6s
+*/
 
-const BAR_MS = BEAT_MS * BEATS_PER_BAR;
-// 2400ms
+const BAR_SECONDS =
+    BEAT_SECONDS * 4;
 
-const RAP_START_DELAY = BAR_MS * 2;
-// 4800ms
-// Bar 1 starts at 0.0
-// Bar 2 starts at 2.4
-// Bar 3 starts at 4.8
+/*
+1 bar = 2.4s
+*/
+
+/*
+Rap starts at 9.6s:
+
+Bar 1 = 0.0
+Bar 2 = 2.4
+Bar 3 = 4.8
+Bar 4 = 7.2
+Bar 5 = 9.6
+
+So first AI line begins at BAR 5.
+*/
+
+const RAP_START_TIME = 9.6;
 
 const BARS_PER_TURN = 4;
 
 
-/* ============================
+/* ============================================================
    ELEMENTS
-============================ */
+============================================================ */
 
 const startScreen =
-    document.getElementById("startScreen");
+    document.getElementById(
+        "startScreen"
+    );
+
+const page =
+    document.getElementById(
+        "page"
+    );
 
 const music =
-    document.getElementById("music");
+    document.getElementById(
+        "music"
+    );
 
 const beatDot =
-    document.getElementById("beatDot");
+    document.getElementById(
+        "beatDot"
+    );
+
+const barCounter =
+    document.getElementById(
+        "barCounter"
+    );
+
+const debugText =
+    document.getElementById(
+        "debugText"
+    );
 
 const rapperElements = [
-    document.getElementById("rapper0"),
-    document.getElementById("rapper1")
+
+    document.getElementById(
+        "rapper0"
+    ),
+
+    document.getElementById(
+        "rapper1"
+    )
+
 ];
 
 const lyricsElements = [
-    document.getElementById("lyrics0"),
-    document.getElementById("lyrics1")
+
+    document.getElementById(
+        "lyrics0"
+    ),
+
+    document.getElementById(
+        "lyrics1"
+    )
+
 ];
 
 
-/* ============================
+/* ============================================================
    RAP DATA
-============================ */
+============================================================ */
 
 const subjects = [
+
     "your haircut",
     "your Wi-Fi",
     "your homework",
@@ -307,16 +540,32 @@ const subjects = [
     "your internet",
     "your chair",
     "your locker",
-    "your maths grade"
+    "your maths grade",
+    "your browser history",
+    "your microphone",
+    "your school laptop",
+    "your lunchbox",
+    "your backpack",
+    "your charger",
+    "your headphones",
+    "your browser tabs",
+    "your desk",
+    "your ringtone",
+    "your keyboard",
+    "your mousepad",
+    "your timetable",
+    "your canteen order"
+
 ];
 
 const weirdObjects = [
+
     "microwave",
     "spoon",
     "printer",
     "banana",
     "battery",
-    "chair",
+    "plastic chair",
     "sandwich",
     "traffic cone",
     "Minecraft torch",
@@ -325,10 +574,27 @@ const weirdObjects = [
     "cardboard sword",
     "school mouse",
     "broken charger",
-    "empty lunchbox"
+    "empty lunchbox",
+    "USB cable",
+    "calculator",
+    "shopping trolley",
+    "ceiling fan",
+    "garden hose",
+    "desk lamp",
+    "toaster",
+    "rubber chicken",
+    "plastic fork",
+    "random brick",
+    "office stapler",
+    "broken keyboard",
+    "water bottle",
+    "one earbud",
+    "half a ruler"
+
 ];
 
 const reactions = [
+
     "tragic",
     "criminal",
     "embarrassing",
@@ -336,7 +602,12 @@ const reactions = [
     "outrageous",
     "suspicious",
     "diabolical",
-    "painful"
+    "painful",
+    "questionable",
+    "disrespectful",
+    "unfortunate",
+    "unrecoverable"
+
 ];
 
 const rhymeGroups = [
@@ -349,7 +620,9 @@ const rhymeGroups = [
         "sight",
         "bright",
         "flight",
-        "tight"
+        "tight",
+        "height",
+        "bite"
     ],
 
     [
@@ -360,7 +633,9 @@ const rhymeGroups = [
         "chain",
         "plane",
         "drain",
-        "lane"
+        "lane",
+        "gain",
+        "main"
     ],
 
     [
@@ -371,7 +646,9 @@ const rhymeGroups = [
         "known",
         "grown",
         "throne",
-        "clone"
+        "clone",
+        "bone",
+        "alone"
     ],
 
     [
@@ -382,7 +659,9 @@ const rhymeGroups = [
         "cool",
         "rule",
         "stool",
-        "fuel"
+        "fuel",
+        "jewel",
+        "mule"
     ],
 
     [
@@ -393,7 +672,9 @@ const rhymeGroups = [
         "mean",
         "machine",
         "canteen",
-        "routine"
+        "routine",
+        "bean",
+        "marine"
     ],
 
     [
@@ -404,7 +685,9 @@ const rhymeGroups = [
         "bear",
         "square",
         "rare",
-        "glare"
+        "glare",
+        "care",
+        "wear"
     ],
 
     [
@@ -415,74 +698,340 @@ const rhymeGroups = [
         "shock",
         "knock",
         "stock",
-        "lock"
+        "lock",
+        "dock",
+        "mock"
+    ],
+
+    [
+        "game",
+        "name",
+        "same",
+        "flame",
+        "frame",
+        "claim",
+        "shame",
+        "blame",
+        "fame",
+        "tame"
+    ],
+
+    [
+        "day",
+        "way",
+        "say",
+        "play",
+        "grey",
+        "stay",
+        "tray",
+        "spray",
+        "delay",
+        "display"
+    ],
+
+    [
+        "code",
+        "road",
+        "mode",
+        "load",
+        "node",
+        "showed",
+        "owed",
+        "glowed",
+        "flowed",
+        "explode"
     ]
 
 ];
 
 
-/* ============================
+/* ============================================================
    HELPERS
-============================ */
+============================================================ */
 
 function random(array) {
 
     return array[
         Math.floor(
-            Math.random() * array.length
+            Math.random() *
+            array.length
         )
     ];
 
 }
 
+function shuffle(array) {
+
+    const arr =
+        [...array];
+
+    for (
+        let i =
+            arr.length - 1;
+
+        i > 0;
+
+        i--
+    ) {
+
+        const j =
+            Math.floor(
+                Math.random() *
+                (i + 1)
+            );
+
+        [
+            arr[i],
+            arr[j]
+        ] = [
+            arr[j],
+            arr[i]
+        ];
+
+    }
+
+    return arr;
+
+}
+
 function newRhymeGroup() {
 
-    return [
-        ...random(rhymeGroups)
-    ];
+    return shuffle(
+        random(
+            rhymeGroups
+        )
+    );
 
 }
 
 
-/* ============================
+/* ============================================================
    STATE
-============================ */
-
-let currentRapper = 0;
-
-let currentBar = 0;
-
-let rhymeWords = newRhymeGroup();
-
-let previousLine = "";
+============================================================ */
 
 let started = false;
 
-let rapInterval = null;
+let currentRapper = 0;
 
-let beatInterval = null;
+let rapperBar = 0;
+
+let rhymeWords =
+    newRhymeGroup();
+
+let previousLine = "";
+
+let lastRapBar = -1;
+
+let lastBeat = -1;
+
+let previousMusicTime = 0;
 
 
-/* ============================
-   UI
-============================ */
+/* ============================================================
+   VOICES
+============================================================ */
 
-function setActiveRapper(index) {
+let voices = [];
+
+let rapperVoices = [
+    null,
+    null
+];
+
+function loadVoices() {
+
+    voices =
+        speechSynthesis
+        .getVoices();
+
+    const english =
+        voices.filter(
+            voice =>
+                voice.lang
+                .toLowerCase()
+                .startsWith("en")
+        );
+
+    const pool =
+        english.length
+        ? english
+        : voices;
+
+    if (
+        pool.length > 0
+    ) {
+
+        rapperVoices[0] =
+            pool[0];
+
+    }
+
+    if (
+        pool.length > 1
+    ) {
+
+        rapperVoices[1] =
+            pool[1];
+
+    }
+
+    else {
+
+        rapperVoices[1] =
+            pool[0] ||
+            null;
+
+    }
+
+}
+
+loadVoices();
+
+speechSynthesis.onvoiceschanged =
+    loadVoices;
+
+
+/* ============================================================
+   TEXT TO SPEECH
+============================================================ */
+
+function speakLine(
+    text,
+    rapperIndex
+) {
+
+    /*
+    Prevent speech from queueing behind.
+    If the previous line is still speaking,
+    kill it and begin the new line now.
+    */
+
+    speechSynthesis.cancel();
 
     rapperElements.forEach(
-        (rapper, i) => {
+        rapper =>
+            rapper.classList.remove(
+                "speaking"
+            )
+    );
+
+    const speech =
+        new SpeechSynthesisUtterance(
+            text
+        );
+
+    if (
+        rapperVoices[
+            rapperIndex
+        ]
+    ) {
+
+        speech.voice =
+            rapperVoices[
+                rapperIndex
+            ];
+
+    }
+
+    /*
+    Different voices.
+    Faster so each bar has a better chance
+    of finishing inside 2.4 seconds.
+    */
+
+    if (
+        rapperIndex === 0
+    ) {
+
+        speech.rate =
+            2.05;
+
+        speech.pitch =
+            0.72;
+
+    }
+
+    else {
+
+        speech.rate =
+            2.00;
+
+        speech.pitch =
+            1.15;
+
+    }
+
+    speech.volume =
+        1;
+
+    speech.onstart =
+        () => {
+
+            rapperElements[
+                rapperIndex
+            ].classList.add(
+                "speaking"
+            );
+
+        };
+
+    speech.onend =
+        () => {
+
+            rapperElements[
+                rapperIndex
+            ].classList.remove(
+                "speaking"
+            );
+
+        };
+
+    speech.onerror =
+        () => {
+
+            rapperElements[
+                rapperIndex
+            ].classList.remove(
+                "speaking"
+            );
+
+        };
+
+    speechSynthesis.speak(
+        speech
+    );
+
+}
+
+
+/* ============================================================
+   ACTIVE RAPPER UI
+============================================================ */
+
+function setActiveRapper(
+    rapperIndex
+) {
+
+    rapperElements.forEach(
+        (rapper, index) => {
 
             rapper.classList.toggle(
                 "active",
-                i === index
+                index ===
+                rapperIndex
             );
 
-            const status =
-                rapper.querySelector(".status");
+            rapper
+                .querySelector(
+                    ".status"
+                )
+                .textContent =
 
-            status.textContent =
-                i === index
+                index ===
+                rapperIndex
+
                 ? "RAPPING"
+
                 : "WAITING";
 
         }
@@ -490,35 +1039,62 @@ function setActiveRapper(index) {
 
 }
 
-function addLine(rapperIndex, text) {
+
+/* ============================================================
+   ADD LYRIC
+============================================================ */
+
+function addLine(
+    rapperIndex,
+    text
+) {
 
     const container =
-        lyricsElements[rapperIndex];
+        lyricsElements[
+            rapperIndex
+        ];
+
+    container
+        .querySelectorAll(
+            ".line"
+        )
+        .forEach(
+            line => {
+
+                line.classList.remove(
+                    "current"
+                );
+
+                line.classList.add(
+                    "old"
+                );
+
+            }
+        );
 
     const line =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
 
-    line.className = "line";
+    line.className =
+        "line current";
 
-    line.textContent = text;
+    line.textContent =
+        text;
 
-    container.appendChild(line);
-
+    container.appendChild(
+        line
+    );
 
     const lines =
-        container.querySelectorAll(".line");
+        container.querySelectorAll(
+            ".line"
+        );
 
-
-    if (lines.length > 5) {
-
-        lines[
-            lines.length - 6
-        ].classList.add("old");
-
-    }
-
-
-    if (lines.length > 8) {
+    if (
+        lines.length > 7
+    ) {
 
         lines[0].remove();
 
@@ -527,129 +1103,144 @@ function addLine(rapperIndex, text) {
 }
 
 
-/* ============================
-   RAP GENERATION
-============================ */
+/* ============================================================
+   RAP LINE GENERATION
+============================================================ */
 
-function generateLine(rhymeWord) {
+function generateLine(
+    rhymeWord
+) {
 
     const enemy =
         currentRapper === 0
         ? "GPT Dawg"
         : "MC Byte";
 
-    const type =
-        Math.floor(
-            Math.random() * 10
-        );
+    const templates = [
 
-    switch (type) {
+        `${enemy}, your whole verse disappeared into the ${rhymeWord}`,
 
-        case 0:
+        `Bro entered the battle holding a ${random(weirdObjects)}, talking about ${rhymeWord}`,
 
-            return `${enemy}, ${random(subjects)} looking rough in the ${rhymeWord}`;
+        `You dropped one verse and somehow damaged the ${rhymeWord}`,
 
-        case 1:
+        `${enemy} tried cooking and somehow burnt the ${rhymeWord}`,
 
-            return `Bro pulled up holding a ${random(weirdObjects)}, calling it ${rhymeWord}`;
+        `Your ${random(subjects)} has more talent than your ${rhymeWord}`,
 
-        case 2:
+        `Bro really brought a ${random(weirdObjects)} and called that ${rhymeWord}`,
 
-            return `You dropped that verse and somehow damaged the ${rhymeWord}`;
+        `Your whole career just disconnected from the ${rhymeWord}`,
 
-        case 3:
+        `I heard your last bar and immediately blamed the ${rhymeWord}`,
 
-            return `${enemy} started cooking then immediately burnt the ${rhymeWord}`;
+        `You tried roasting me and somehow complimented the ${rhymeWord}`,
 
-        case 4:
+        `Your bars got less power than a Chromebook running ${rhymeWord}`,
 
-            return `That last bar was ${random(reactions)}, go apologise to the ${rhymeWord}`;
+        `${enemy}, even your ${random(subjects)} wants a refund from the ${rhymeWord}`,
 
-        case 5:
+        `Bro said he had bars then pulled out a ${random(weirdObjects)} and yelled ${rhymeWord}`,
 
-            return `Your whole rap career just disconnected from the ${rhymeWord}`;
+        `Your last rhyme was so ${random(reactions)} it frightened the ${rhymeWord}`,
 
-        case 6:
+        `You came here confident then got folded by the ${rhymeWord}`,
 
-            return `Bro got ${random(subjects)} and still thinks he owns the ${rhymeWord}`;
+        `I would roast you harder but your ${random(subjects)} already did the ${rhymeWord}`,
 
-        case 7:
+        `Your flow loaded slower than school Wi-Fi in the ${rhymeWord}`
 
-            return `I heard that flow and immediately blamed the ${rhymeWord}`;
+    ];
 
-        case 8:
+    if (
+        previousLine &&
+        Math.random() <
+        0.25
+    ) {
 
-            return `You tried to roast me but somehow complimented my ${rhymeWord}`;
-
-        case 9:
-
-            if (previousLine) {
-
-                const words =
-                    previousLine
-                    .split(" ")
-                    .map(word =>
+        const words =
+            previousLine
+                .split(" ")
+                .map(
+                    word =>
                         word.replace(
                             /[^a-zA-Z]/g,
                             ""
                         )
-                    )
-                    .filter(Boolean);
+                )
+                .filter(
+                    word =>
+                        word.length > 3
+                );
 
-                const picked =
-                    random(words);
+        if (
+            words.length > 0
+        ) {
 
-                return `Bro really said "${picked}" and thought that would save his ${rhymeWord}`;
+            const picked =
+                random(
+                    words
+                );
 
-            }
+            return (
+                `You really said ${picked}, now explain that ${rhymeWord}`
+            );
 
-            return `Nobody knows what's happening, including the ${rhymeWord}`;
+        }
 
     }
+
+    return random(
+        templates
+    );
 
 }
 
 
-/* ============================
-   RAP LOOP
-============================ */
+/* ============================================================
+   RAP BAR
+============================================================ */
 
 function rapBar() {
 
-    if (rhymeWords.length === 0) {
+    if (
+        rhymeWords.length === 0
+    ) {
 
         rhymeWords =
             newRhymeGroup();
 
     }
 
-
-    const rhymeWord =
+    const rhyme =
         rhymeWords.shift();
-
 
     const line =
         generateLine(
-            rhymeWord
+            rhyme
         );
-
 
     addLine(
         currentRapper,
         line
     );
 
+    speakLine(
+        line,
+        currentRapper
+    );
 
-    previousLine = line;
+    previousLine =
+        line;
 
-    currentBar++;
-
+    rapperBar++;
 
     if (
-        currentBar >= BARS_PER_TURN
+        rapperBar >=
+        BARS_PER_TURN
     ) {
 
-        currentBar = 0;
+        rapperBar = 0;
 
         currentRapper =
             currentRapper === 0
@@ -668,9 +1259,9 @@ function rapBar() {
 }
 
 
-/* ============================
+/* ============================================================
    BEAT FLASH
-============================ */
+============================================================ */
 
 function flashBeat() {
 
@@ -687,106 +1278,676 @@ function flashBeat() {
 }
 
 
-/* ============================
-   START
-============================ */
+/* ============================================================
+   AUDIO VISUALIZER
+============================================================ */
 
-startScreen.addEventListener(
-    "click",
-    async () => {
+const canvas =
+    document.getElementById(
+        "visualizer"
+    );
 
-        if (started) {
-            return;
+const ctx =
+    canvas.getContext(
+        "2d"
+    );
+
+let audioContext =
+    null;
+
+let analyser =
+    null;
+
+let sourceNode =
+    null;
+
+let frequencyData =
+    null;
+
+let visualizerReady =
+    false;
+
+function setupAudioVisualizer() {
+
+    if (
+        visualizerReady
+    ) {
+
+        return;
+
+    }
+
+    audioContext =
+        new (
+            window.AudioContext ||
+            window.webkitAudioContext
+        )();
+
+    analyser =
+        audioContext
+        .createAnalyser();
+
+    analyser.fftSize =
+        1024;
+
+    analyser.smoothingTimeConstant =
+        0.78;
+
+    frequencyData =
+        new Uint8Array(
+            analyser
+            .frequencyBinCount
+        );
+
+    sourceNode =
+        audioContext
+        .createMediaElementSource(
+            music
+        );
+
+    sourceNode.connect(
+        analyser
+    );
+
+    analyser.connect(
+        audioContext.destination
+    );
+
+    visualizerReady =
+        true;
+
+}
+
+
+/* ============================================================
+   RESIZE VISUALIZER
+============================================================ */
+
+function resizeVisualizer() {
+
+    const rect =
+        canvas
+        .getBoundingClientRect();
+
+    const dpr =
+        window.devicePixelRatio ||
+        1;
+
+    canvas.width =
+        Math.max(
+            1,
+            Math.floor(
+                rect.width *
+                dpr
+            )
+        );
+
+    canvas.height =
+        Math.max(
+            1,
+            Math.floor(
+                rect.height *
+                dpr
+            )
+        );
+
+    ctx.setTransform(
+        dpr,
+        0,
+        0,
+        dpr,
+        0,
+        0
+    );
+
+}
+
+window.addEventListener(
+    "resize",
+    resizeVisualizer
+);
+
+
+/* ============================================================
+   VISUALIZER DRAW
+============================================================ */
+
+function drawVisualizer() {
+
+    requestAnimationFrame(
+        drawVisualizer
+    );
+
+    if (
+        !analyser ||
+        !frequencyData
+    ) {
+
+        return;
+
+    }
+
+    analyser
+        .getByteFrequencyData(
+            frequencyData
+        );
+
+    const rect =
+        canvas
+        .getBoundingClientRect();
+
+    const width =
+        rect.width;
+
+    const height =
+        rect.height;
+
+    ctx.clearRect(
+        0,
+        0,
+        width,
+        height
+    );
+
+    /*
+    Spectrum goes:
+    LEFT = bass / low pitch
+    RIGHT = treble / high pitch
+
+    Colour goes:
+    GREEN -> YELLOW -> ORANGE -> RED
+    */
+
+    const BAR_COUNT =
+        96;
+
+    const usableBins =
+        Math.min(
+            frequencyData.length,
+            250
+        );
+
+    const step =
+        usableBins /
+        BAR_COUNT;
+
+    const gap =
+        2;
+
+    const barWidth =
+        width /
+        BAR_COUNT;
+
+    let bassTotal =
+        0;
+
+    let bassSamples =
+        0;
+
+    for (
+        let i = 0;
+
+        i <
+        BAR_COUNT;
+
+        i++
+    ) {
+
+        const binIndex =
+            Math.floor(
+                i *
+                step
+            );
+
+        const value =
+            frequencyData[
+                binIndex
+            ] /
+            255;
+
+        const boosted =
+            Math.pow(
+                value,
+                0.72
+            );
+
+        const barHeight =
+            boosted *
+            (
+                height -
+                24
+            );
+
+        const ratio =
+            i /
+            (
+                BAR_COUNT -
+                1
+            );
+
+        /*
+        HSL hue:
+        120 = green
+        60  = yellow
+        30  = orange
+        0   = red
+        */
+
+        const hue =
+            120 -
+            (
+                ratio *
+                120
+            );
+
+        const color =
+            `hsl(${hue}, 92%, 52%)`;
+
+        ctx.fillStyle =
+            color;
+
+        ctx.shadowBlur =
+            8;
+
+        ctx.shadowColor =
+            color;
+
+        ctx.fillRect(
+
+            i *
+            barWidth,
+
+            height -
+            barHeight,
+
+            Math.max(
+                1,
+                barWidth -
+                gap
+            ),
+
+            barHeight
+
+        );
+
+        if (
+            i <
+            BAR_COUNT *
+            0.14
+        ) {
+
+            bassTotal +=
+                value;
+
+            bassSamples++;
+
         }
 
+    }
+
+    ctx.shadowBlur =
+        0;
+
+    const bass =
+        bassSamples > 0
+
+        ? bassTotal /
+          bassSamples
+
+        : 0;
+
+    /*
+    Slight screen pulse on bass.
+    */
+
+    if (
+        bass >
+        0.50
+    ) {
+
+        const pulse =
+            1 +
+            (
+                bass *
+                0.005
+            );
+
+        page.style.transform =
+            `scale(${pulse})`;
+
+    }
+
+    else {
+
+        page.style.transform =
+            "scale(1)";
+
+    }
+
+}
+
+
+/* ============================================================
+   MASTER MUSIC SYNC
+============================================================ */
+
+function syncLoop() {
+
+    requestAnimationFrame(
+        syncLoop
+    );
+
+    if (
+        !started
+    ) {
+
+        return;
+
+    }
+
+    const time =
+        music.currentTime;
+
+    /*
+    Detect the MP3 looping back to the start.
+    */
+
+    if (
+        time <
+        previousMusicTime -
+        1
+    ) {
+
+        lastBeat =
+            -1;
+
+        lastRapBar =
+            -1;
+
+        speechSynthesis.cancel();
+
+    }
+
+    previousMusicTime =
+        time;
+
+    /*
+    Bar counter.
+    */
+
+    const songBar =
+        Math.floor(
+            time /
+            BAR_SECONDS
+        ) +
+        1;
+
+    barCounter.textContent =
+        `BAR ${songBar}`;
+
+    /*
+    Beat pulse.
+    */
+
+    const beat =
+        Math.floor(
+            time /
+            BEAT_SECONDS
+        );
+
+    if (
+        beat !==
+        lastBeat
+    ) {
+
+        lastBeat =
+            beat;
+
+        flashBeat();
+
+    }
+
+    /*
+    Rap starts at 9.6 seconds.
+    Then one new line per bar.
+    */
+
+    if (
+        time >=
+        RAP_START_TIME
+    ) {
+
+        const rapTime =
+            time -
+            RAP_START_TIME;
+
+        const rapBarNumber =
+            Math.floor(
+                rapTime /
+                BAR_SECONDS
+            );
+
+        if (
+            rapBarNumber >
+            lastRapBar
+        ) {
+
+            lastRapBar =
+                rapBarNumber;
+
+            rapBar();
+
+        }
+
+    }
+
+    debugText.textContent =
+        `${time.toFixed(2)}s`;
+
+}
+
+
+/* ============================================================
+   START BUTTON
+============================================================ */
+
+startScreen.addEventListener(
+
+    "click",
+
+    async () => {
+
+        if (
+            started
+        ) {
+
+            return;
+
+        }
 
         try {
 
-            music.currentTime = 0;
+            /*
+            IMPORTANT:
+            Start MUSIC FIRST.
+
+            This way if the visualizer fails,
+            the song still plays.
+            */
+
+            music.pause();
+
+            music.currentTime =
+                0;
+
+            speechSynthesis.cancel();
 
             await music.play();
 
-            started = true;
+            console.log(
+                "SONG STARTED"
+            );
 
+            /*
+            Reset battle.
+            */
+
+            currentRapper =
+                0;
+
+            rapperBar =
+                0;
+
+            rhymeWords =
+                newRhymeGroup();
+
+            previousLine =
+                "";
+
+            lastRapBar =
+                -1;
+
+            lastBeat =
+                -1;
+
+            previousMusicTime =
+                0;
+
+            started =
+                true;
 
             startScreen.style.display =
                 "none";
 
+            setActiveRapper(
+                0
+            );
 
-            /* Start visual beat immediately */
+            requestAnimationFrame(
+                syncLoop
+            );
 
-            flashBeat();
+            /*
+            Try starting visualizer AFTER music.
+            */
 
-            beatInterval =
-                setInterval(
-                    flashBeat,
-                    BEAT_MS
+            try {
+
+                setupAudioVisualizer();
+
+                if (
+                    audioContext.state ===
+                    "suspended"
+                ) {
+
+                    await audioContext.resume();
+
+                }
+
+                resizeVisualizer();
+
+                requestAnimationFrame(
+                    drawVisualizer
                 );
 
+                console.log(
+                    "VISUALIZER STARTED"
+                );
 
-            /* Bar 1 = music only
-               Bar 2 = music only
-               Bar 3 = rapper starts */
+            }
 
-            setTimeout(
-                () => {
+            catch (
+                visualizerError
+            ) {
 
-                    currentRapper = 0;
+                console.warn(
+                    "Visualizer failed, but music is still playing:",
+                    visualizerError
+                );
 
-                    currentBar = 0;
-
-                    rhymeWords =
-                        newRhymeGroup();
-
-                    setActiveRapper(0);
-
-
-                    rapBar();
-
-
-                    rapInterval =
-                        setInterval(
-                            rapBar,
-                            BAR_MS
-                        );
-
-                },
-                RAP_START_DELAY
-            );
+            }
 
         }
 
-        catch (error) {
+        catch (
+            error
+        ) {
 
             console.error(
-                "Could not play rapsong.mp3:",
+                "MUSIC FAILED:",
                 error
             );
 
             alert(
-                "rapsong.mp3 could not be played. Make sure it is in the same folder as index.html."
+                "rapsong.mp3 could not play. Make sure rapsong.mp3 is in the same folder as index.html."
             );
 
         }
 
     }
+
 );
 
 
-/* ============================
-   AUDIO ERROR CHECK
-============================ */
+/* ============================================================
+   AUDIO DEBUGGING
+============================================================ */
 
 music.addEventListener(
+
+    "loadeddata",
+
+    () => {
+
+        console.log(
+            "rapsong.mp3 loaded"
+        );
+
+    }
+
+);
+
+music.addEventListener(
+
+    "canplay",
+
+    () => {
+
+        console.log(
+            "rapsong.mp3 can play"
+        );
+
+    }
+
+);
+
+music.addEventListener(
+
+    "play",
+
+    () => {
+
+        console.log(
+            "rapsong.mp3 playback started"
+        );
+
+    }
+
+);
+
+music.addEventListener(
+
     "error",
+
     () => {
 
         console.error(
-            "Audio loading error:",
+            "Could not load rapsong.mp3",
             music.error
         );
 
     }
+
 );
 
 </script>
